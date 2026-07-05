@@ -4,21 +4,14 @@ local uci = require "luci.model.uci".cursor()
 local dispatcher = require "luci.dispatcher"
 local hostname = sys.hostname() or "OpenWrt"
 local request = dispatcher.context.request
-local category = request and request[1] or nil
-local tree = dispatcher.node()
-local cattree = category and dispatcher.node(category) or nil
+local category = request and request[2] or nil
+local menu_root = dispatcher.menu_json() or {}
+local admin_tree = menu_root.children and menu_root.children.admin or menu_root
 local flux_defaults = {
   slot1 = { label = "Home", icon = "home", path = "/", dropdown = "0" },
   slot2 = { label = "Services", icon = "services", path = "admin/services", dropdown = "1" },
   slot3 = { label = "Network", icon = "network", path = "admin/network", dropdown = "1" }
 }
-local function nodeurl(prefix, name)
-  if prefix then
-    return dispatcher.build_url(prefix, name)
-  end
-
-  return dispatcher.build_url(name)
-end
 local function split_path(path)
   local parts = {}
 
@@ -41,12 +34,43 @@ local function pathurl(path)
 end
 local function pathnode(path)
   local parts = split_path(path)
+  local node = menu_root
 
   if #parts == 0 then
-    return tree
+    return menu_root
   end
 
-  return dispatcher.node(unpack(parts))
+  for _, part in ipairs(parts) do
+    node = node and node.children and node.children[part] or nil
+  end
+
+  return node
+end
+local function sorted_children(node)
+  local children = {}
+
+  if not node or type(node.children) ~= "table" then
+    return children
+  end
+
+  for name, child in pairs(node.children) do
+    if child and child.title then
+      children[#children + 1] = { name = name, node = child }
+    end
+  end
+
+  table.sort(children, function(a, b)
+    local ao = tonumber(a.node.order or 1000)
+    local bo = tonumber(b.node.order or 1000)
+
+    if ao == bo then
+      return tostring(a.node.title) < tostring(b.node.title)
+    end
+
+    return ao < bo
+  end)
+
+  return children
 end
 local function slot_config(slot)
   local fallback = flux_defaults[slot] or flux_defaults.slot1
@@ -60,23 +84,22 @@ local function slot_config(slot)
   }
 end
 local function render_menu_tree(node, prefix, depth)
-  if not node or not node.children or #node.children == 0 then
+  local children = sorted_children(node)
+
+  if #children == 0 then
     return
   end
 
   write('<ul class="flux-bottom-list flux-depth-' .. tostring(depth or 0) .. '">')
 
-  for _, child in ipairs(node.children) do
-    local item = node.nodes and node.nodes[child]
+  for _, child in ipairs(children) do
+    local item = child.node
+    local child_path = prefix and (prefix .. "/" .. child.name) or child.name
 
-    if item and item.title and item.target then
-      local child_path = prefix and (prefix .. "/" .. child) or child
-
-      write('<li>')
-      write('<a href="' .. pcdata(pathurl(child_path)) .. '">' .. pcdata(translate(item.title)) .. '</a>')
-      render_menu_tree(item, child_path, (depth or 0) + 1)
-      write('</li>')
-    end
+    write('<li>')
+    write('<a href="' .. pcdata(pathurl(child_path)) .. '">' .. pcdata(translate(item.title)) .. '</a>')
+    render_menu_tree(item, child_path, (depth or 0) + 1)
+    write('</li>')
   end
 
   write('</ul>')
@@ -87,7 +110,7 @@ local function render_bottom_slot(slot, config)
   end
 
   local menu_node = pathnode(config.path)
-  local has_dropdown = config.dropdown == "1" and menu_node and menu_node.children and #menu_node.children > 0
+  local has_dropdown = config.dropdown == "1" and #sorted_children(menu_node) > 0
 
   write('<div class="flux-bottom-item' .. (has_dropdown and ' has-menu' or '') .. '" data-flux-bottom-item>')
   write('<a class="flux-bottom-link" href="' .. pcdata(pathurl(config.path)) .. '" data-flux-bottom-link data-icon="' .. pcdata(config.icon) .. '">')
@@ -144,28 +167,29 @@ local flux_slot3 = slot_config("slot3")
       <aside class="flux-sidebar">
         <nav id="mainmenu" aria-label="<%:Main navigation%>">
           <ul>
-            <% if tree then for _, v in ipairs(tree.children or {}) do
-              local nnode = tree.nodes[v]
-              if nnode and nnode.title and nnode.target then
+            <% for _, child in ipairs(sorted_children(admin_tree)) do
+              local v = child.name
+              local nnode = child.node
             -%>
               <li class="<%=category == v and 'active' or ''%>">
-                <a href="<%=nodeurl(nil, v)%>"><%=pcdata(translate(nnode.title))%></a>
+                <a href="<%=dispatcher.build_url("admin", v)%>"><%=pcdata(translate(nnode.title))%></a>
               </li>
-            <% end end end -%>
+            <% end -%>
           </ul>
         </nav>
 
-        <% if cattree and cattree.children and #cattree.children > 0 then -%>
+        <% local cattree = category and admin_tree.children and admin_tree.children[category] or nil
+          if #sorted_children(cattree) > 0 then -%>
         <nav id="modemenu" aria-label="<%:Section navigation%>">
           <ul>
-            <% for _, v in ipairs(cattree.children) do
-              local nnode = cattree.nodes[v]
-              if nnode and nnode.title and nnode.target then
+            <% for _, child in ipairs(sorted_children(cattree)) do
+              local v = child.name
+              local nnode = child.node
             -%>
-              <li class="<%=request and request[2] == v and 'active' or ''%>">
-                <a href="<%=nodeurl(category, v)%>"><%=pcdata(translate(nnode.title))%></a>
+              <li class="<%=request and request[3] == v and 'active' or ''%>">
+                <a href="<%=dispatcher.build_url("admin", category, v)%>"><%=pcdata(translate(nnode.title))%></a>
               </li>
-            <% end end -%>
+            <% end -%>
           </ul>
         </nav>
         <% end -%>
