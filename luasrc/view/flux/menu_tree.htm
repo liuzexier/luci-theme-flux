@@ -1,10 +1,81 @@
 <%
+local fs = require "nixio.fs"
+local uci = require "luci.model.uci".cursor()
 local dispatcher = require "luci.dispatcher"
 local menu_root = dispatcher.menu_json() or {}
 local admin_tree = menu_root.children and menu_root.children.admin or menu_root
 
-local function menu_url(...)
-  return dispatcher.build_url(...)
+local function split_path(path)
+  local parts = {}
+
+  for part in tostring(path or ""):gmatch("[^/]+") do
+    parts[#parts + 1] = part
+  end
+
+  return parts
+end
+
+local function menu_url(path)
+  return dispatcher.build_url(unpack(split_path(path)))
+end
+
+local function uci_section_exists(config, section)
+  local ok, value = pcall(function()
+    return uci:get_all(config, section)
+  end)
+
+  return ok and value ~= nil
+end
+
+local function uci_type_exists(config, section_type)
+  local found = false
+
+  pcall(function()
+    uci:foreach(config, section_type, function()
+      found = true
+      return false
+    end)
+  end)
+
+  return found
+end
+
+local function depends_satisfied(node)
+  local depends = node and node.depends
+
+  if type(depends) ~= "table" then
+    return true
+  end
+
+  if type(depends.fs) == "table" then
+    for path, mode in pairs(depends.fs) do
+      if mode == "executable" then
+        if not fs.access(path, "x") then
+          return false
+        end
+      elseif not fs.access(path) then
+        return false
+      end
+    end
+  end
+
+  if type(depends.uci) == "table" then
+    for config, rule in pairs(depends.uci) do
+      if type(rule) == "table" then
+        for section, _ in pairs(rule) do
+          if tostring(section):sub(1, 1) == "@" then
+            if not uci_type_exists(config, tostring(section):sub(2)) then
+              return false
+            end
+          elseif not uci_section_exists(config, section) then
+            return false
+          end
+        end
+      end
+    end
+  end
+
+  return true
 end
 
 local function sorted_children(node)
@@ -15,7 +86,7 @@ local function sorted_children(node)
   end
 
   for name, child in pairs(node.children) do
-    if child and child.title then
+    if child and child.title and depends_satisfied(child) then
       children[#children + 1] = { name = name, node = child }
     end
   end
@@ -33,25 +104,30 @@ local function sorted_children(node)
 
   return children
 end
+
+local function render_directory(node, prefix, depth)
+  local children = sorted_children(node)
+
+  for _, child in ipairs(children) do
+    local item = child.node
+    local child_path = prefix and (prefix .. "/" .. child.name) or child.name
+    local grandchildren = sorted_children(item)
+    local title = pcdata(translate(item.title))
+
+    if #grandchildren > 0 then
+      write('<details class="flux-menu-directory-branch flux-depth-' .. tostring(depth or 0) .. '">')
+      write('<summary>' .. title .. '</summary>')
+      write('<div class="flux-menu-directory-children">')
+      render_directory(item, child_path, (depth or 0) + 1)
+      write('</div>')
+      write('</details>')
+    else
+      write('<a class="flux-menu-directory-link flux-depth-' .. tostring(depth or 0) .. '" href="' .. pcdata(menu_url(child_path)) .. '">' .. title .. '</a>')
+    end
+  end
+end
 -%>
 
 <div class="flux-menu-directory">
-  <% for _, first_child in ipairs(sorted_children(admin_tree)) do
-    local first = first_child.name
-    local first_node = first_child.node
-  -%>
-    <details>
-      <summary><%=pcdata(translate(first_node.title))%></summary>
-      <ul>
-        <% for _, second_child in ipairs(sorted_children(first_node)) do
-          local second = second_child.name
-          local second_node = second_child.node
-        -%>
-          <li>
-            <a href="<%=menu_url("admin", first, second)%>"><%=pcdata(translate(second_node.title))%></a>
-          </li>
-        <% end -%>
-      </ul>
-    </details>
-  <% end -%>
+  <% render_directory(admin_tree, "admin", 0) %>
 </div>

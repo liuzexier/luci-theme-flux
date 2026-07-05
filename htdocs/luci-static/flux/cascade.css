@@ -46,6 +46,7 @@ body {
   font: 14px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   margin: 0;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 a {
@@ -116,6 +117,7 @@ a:focus-visible {
 
 .flux-content {
   min-width: 0;
+  overflow-x: hidden;
   padding: 20px;
 }
 
@@ -123,6 +125,7 @@ a:focus-visible {
   margin: 0 auto;
   max-width: 1280px;
   min-width: 0;
+  overflow-x: hidden;
   width: 100%;
 }
 
@@ -293,7 +296,8 @@ a:focus-visible {
   min-width: 0;
 }
 
-.flux-bottom-list a {
+.flux-bottom-list a,
+.flux-bottom-list summary {
   color: #d0d0d0;
   display: block;
   font-size: 15px;
@@ -307,19 +311,42 @@ a:focus-visible {
 }
 
 .flux-bottom-list a:hover,
-.flux-bottom-list a:focus-visible {
+.flux-bottom-list a:focus-visible,
+.flux-bottom-list summary:hover,
+.flux-bottom-list summary:focus-visible {
   background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
+  cursor: pointer;
   text-decoration: none;
 }
 
-.flux-bottom-list .flux-bottom-list a {
+.flux-bottom-list summary {
+  list-style: none;
+}
+
+.flux-bottom-list summary::-webkit-details-marker {
+  display: none;
+}
+
+.flux-bottom-list summary::after {
+  color: #98a2b3;
+  content: "⌄";
+  float: right;
+}
+
+.flux-bottom-list details[open] > summary::after {
+  content: "⌃";
+}
+
+.flux-bottom-list .flux-bottom-list a,
+.flux-bottom-list .flux-bottom-list summary {
   color: #aeb4bd;
   font-size: 14px;
   padding-left: 38px;
 }
 
-.flux-depth-2 a {
+.flux-depth-2 a,
+.flux-depth-2 summary {
   padding-left: 52px;
 }
 
@@ -390,6 +417,8 @@ h3 {
 .cbi-map,
 .cbi-section {
   margin-bottom: 16px;
+  max-width: 100%;
+  overflow-x: auto;
   padding: 16px;
 }
 
@@ -534,6 +563,13 @@ th,
 
 .cbi-value-field {
   min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cbi-value-field > * {
+  max-width: 100%;
 }
 
 .cbi-page-actions {
@@ -555,14 +591,16 @@ th,
   margin-top: 16px;
 }
 
-.flux-menu-directory details {
+.flux-menu-directory details,
+.flux-menu-directory-link {
   background: var(--flux-surface);
   border: 1px solid var(--flux-border);
   border-radius: var(--flux-radius);
   overflow: hidden;
 }
 
-.flux-menu-directory summary {
+.flux-menu-directory summary,
+.flux-menu-directory-link {
   color: var(--flux-text);
   cursor: pointer;
   font-weight: 700;
@@ -585,17 +623,24 @@ th,
   content: "⌃";
 }
 
+.flux-menu-directory-children,
 .flux-menu-directory ul {
   border-top: 1px solid var(--flux-border);
-  list-style: none;
   margin: 0;
   padding: 6px;
 }
 
-.flux-menu-directory a {
+.flux-menu-directory-children {
+  display: grid;
+  gap: 4px;
+}
+
+.flux-menu-directory a,
+.flux-menu-directory-children summary {
   border-radius: var(--flux-radius);
   color: var(--flux-muted);
   display: block;
+  font-weight: 600;
   min-height: 40px;
   overflow: hidden;
   padding: 9px 10px;
@@ -604,7 +649,9 @@ th,
 }
 
 .flux-menu-directory a:hover,
-.flux-menu-directory a:focus-visible {
+.flux-menu-directory a:focus-visible,
+.flux-menu-directory-children summary:hover,
+.flux-menu-directory-children summary:focus-visible {
   background: var(--flux-surface-strong);
   color: var(--flux-accent-strong);
   text-decoration: none;
@@ -675,6 +722,7 @@ th,
   .cbi-section-table,
   table {
     display: block;
+    max-width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
@@ -709,7 +757,8 @@ th,
     width: 100vw;
   }
 
-  .flux-bottom-list a {
+  .flux-bottom-list a,
+  .flux-bottom-list summary {
     font-size: 16px;
     min-height: 40px;
   }

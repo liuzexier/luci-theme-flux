@@ -1,5 +1,6 @@
 <%
 local sys = require "luci.sys"
+local fs = require "nixio.fs"
 local uci = require "luci.model.uci".cursor()
 local dispatcher = require "luci.dispatcher"
 local hostname = sys.hostname() or "OpenWrt"
@@ -46,6 +47,62 @@ local function pathnode(path)
 
   return node
 end
+local function uci_section_exists(config, section)
+  local ok, value = pcall(function()
+    return uci:get_all(config, section)
+  end)
+
+  return ok and value ~= nil
+end
+local function uci_type_exists(config, section_type)
+  local found = false
+
+  pcall(function()
+    uci:foreach(config, section_type, function()
+      found = true
+      return false
+    end)
+  end)
+
+  return found
+end
+local function depends_satisfied(node)
+  local depends = node and node.depends
+
+  if type(depends) ~= "table" then
+    return true
+  end
+
+  if type(depends.fs) == "table" then
+    for path, mode in pairs(depends.fs) do
+      if mode == "executable" then
+        if not fs.access(path, "x") then
+          return false
+        end
+      elseif not fs.access(path) then
+        return false
+      end
+    end
+  end
+
+  if type(depends.uci) == "table" then
+    for config, rule in pairs(depends.uci) do
+      if type(rule) == "table" then
+        for section, _ in pairs(rule) do
+          if tostring(section):sub(1, 1) == "@" then
+            if not uci_type_exists(config, tostring(section):sub(2)) then
+              return false
+            end
+          elseif not uci_section_exists(config, section) then
+            return false
+          end
+        end
+      end
+    end
+  end
+
+  return true
+end
 local function sorted_children(node)
   local children = {}
 
@@ -54,7 +111,7 @@ local function sorted_children(node)
   end
 
   for name, child in pairs(node.children) do
-    if child and child.title then
+    if child and child.title and depends_satisfied(child) then
       children[#children + 1] = { name = name, node = child }
     end
   end
@@ -71,6 +128,9 @@ local function sorted_children(node)
   end)
 
   return children
+end
+local function has_children(node)
+  return #sorted_children(node) > 0
 end
 local function slot_config(slot)
   local fallback = flux_defaults[slot] or flux_defaults.slot1
@@ -95,11 +155,16 @@ local function render_menu_tree(node, prefix, depth)
   for _, child in ipairs(children) do
     local item = child.node
     local child_path = prefix and (prefix .. "/" .. child.name) or child.name
+    local branch = has_children(item)
 
-    write('<li>')
-    write('<a href="' .. pcdata(pathurl(child_path)) .. '">' .. pcdata(translate(item.title)) .. '</a>')
-    render_menu_tree(item, child_path, (depth or 0) + 1)
-    write('</li>')
+    if branch then
+      write('<li class="flux-bottom-branch"><details>')
+      write('<summary>' .. pcdata(translate(item.title)) .. '</summary>')
+      render_menu_tree(item, child_path, (depth or 0) + 1)
+      write('</details></li>')
+    else
+      write('<li><a href="' .. pcdata(pathurl(child_path)) .. '">' .. pcdata(translate(item.title)) .. '</a></li>')
+    end
   end
 
   write('</ul>')
