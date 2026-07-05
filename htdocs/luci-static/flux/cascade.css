@@ -103,16 +103,18 @@ a:focus-visible {
 
 .flux-layout {
   display: grid;
-  grid-template-columns: 260px minmax(0, 1fr);
+  grid-template-columns: 280px minmax(0, 1fr);
   min-height: calc(100vh - var(--flux-header-height));
 }
 
 .flux-sidebar {
-  background: var(--flux-surface);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--flux-surface) 96%, var(--flux-accent) 4%), var(--flux-surface));
   border-right: 1px solid var(--flux-border);
   min-width: 0;
   overflow-y: auto;
-  padding: 14px;
+  padding: 14px 12px 22px;
+  scrollbar-width: thin;
 }
 
 .flux-content {
@@ -362,23 +364,26 @@ a:focus-visible {
 }
 
 #mainmenu li {
-  margin: 2px 0;
+  margin: 3px 0;
   min-width: 0;
 }
 
 #mainmenu a,
 #mainmenu summary {
   align-items: center;
-  border-radius: var(--flux-radius);
-  color: var(--flux-text);
+  border-radius: 7px;
+  color: color-mix(in srgb, var(--flux-text) 86%, var(--flux-muted));
   display: flex;
-  font-weight: 600;
-  min-height: 38px;
-  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 650;
+  min-height: 36px;
+  padding: 8px 10px 8px 12px;
   list-style: none;
   min-width: 0;
   overflow: hidden;
+  position: relative;
   text-overflow: ellipsis;
+  transition: background 140ms ease, color 140ms ease, transform 140ms ease;
   white-space: nowrap;
 }
 
@@ -393,6 +398,7 @@ a:focus-visible {
 #mainmenu summary::after {
   color: var(--flux-muted);
   content: "⌄";
+  font-size: 12px;
   margin-left: auto;
   padding-left: 10px;
 }
@@ -407,26 +413,49 @@ a:focus-visible {
 #mainmenu a:focus-visible,
 #mainmenu summary:hover,
 #mainmenu summary:focus-visible {
-  background: var(--flux-surface-strong);
+  background: color-mix(in srgb, var(--flux-accent) 10%, var(--flux-surface));
   color: var(--flux-accent-strong);
   text-decoration: none;
+}
+
+#mainmenu a:hover,
+#mainmenu summary:hover {
+  transform: translateX(2px);
+}
+
+#mainmenu .active > a::before,
+#mainmenu .active > details > summary::before {
+  background: var(--flux-accent);
+  border-radius: 999px;
+  content: "";
+  height: 18px;
+  left: 0;
+  position: absolute;
+  width: 3px;
+}
+
+#mainmenu details[open] > .flux-sidebar-list {
+  border-left: 1px solid color-mix(in srgb, var(--flux-border) 80%, transparent);
+  margin-left: 13px;
+  padding: 3px 0 3px 8px;
 }
 
 #mainmenu ul ul a,
 #mainmenu ul ul summary {
   color: var(--flux-muted);
-  font-size: 13px;
-  padding-left: 20px;
+  font-size: 12.5px;
+  min-height: 34px;
+  padding-left: 12px;
 }
 
 #mainmenu ul ul ul a,
 #mainmenu ul ul ul summary {
-  padding-left: 32px;
+  padding-left: 12px;
 }
 
 #mainmenu ul ul ul ul a,
 #mainmenu ul ul ul ul summary {
-  padding-left: 44px;
+  padding-left: 12px;
 }
 
 h1,

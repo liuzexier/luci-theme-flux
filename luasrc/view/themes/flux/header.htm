@@ -3,6 +3,7 @@ local sys = require "luci.sys"
 local fs = require "nixio.fs"
 local uci = require "luci.model.uci".cursor()
 local dispatcher = require "luci.dispatcher"
+local ver = require "luci.version"
 local hostname = sys.hostname() or "OpenWrt"
 local request = dispatcher.context.request
 local current_path = request and table.concat(request, "/") or ""
@@ -235,6 +236,7 @@ local flux_slot3 = slot_config("slot3")
   <meta name="format-detection" content="telephone=no">
   <title><%=striptags(hostname)%> - LuCI</title>
   <link rel="stylesheet" href="<%=media%>/cascade.css">
+  <script src="<%=url('admin/translations', luci.i18n.context.lang)%>?v=<%=ver.luciversion%>"></script>
   <script src="<%=resource%>/xhr.js"></script>
   <script src="<%=resource%>/cbi.js"></script>
   <script src="<%=media%>/mobile.js" defer></script>
@@ -268,7 +270,7 @@ local flux_slot3 = slot_config("slot3")
         </nav>
       </aside>
 
-      <main class="flux-content">
+      <main class="flux-content" id="maincontent">
         <div class="flux-main">
           <noscript>
             <div class="alert-message warning"><%:JavaScript is required for LuCI to work properly.%></div>
