@@ -14,6 +14,43 @@ local flux_defaults = {
   slot2 = { label = "Services", icon = "services", path = "admin/services", dropdown = "1" },
   slot3 = { label = "Network", icon = "network", path = "admin/network", dropdown = "1" }
 }
+local function valid_hex(value, fallback)
+  value = tostring(value or "")
+
+  if value:match("^#%x%x%x%x%x%x$") then
+    return value
+  end
+
+  return fallback
+end
+local function hex_rgb(value)
+  value = tostring(value or "#000000"):gsub("#", "")
+
+  return tostring(tonumber(value:sub(1, 2), 16) or 0) .. ", " ..
+    tostring(tonumber(value:sub(3, 4), 16) or 0) .. ", " ..
+    tostring(tonumber(value:sub(5, 6), 16) or 0)
+end
+local function clamp_number(value, fallback, min, max)
+  local number = tonumber(value) or fallback
+
+  if number < min then
+    return min
+  end
+
+  if number > max then
+    return max
+  end
+
+  return number
+end
+local theme_mode = uci:get("flux", "theme", "mode") or "auto"
+if theme_mode ~= "light" and theme_mode ~= "dark" then
+  theme_mode = "auto"
+end
+local theme_primary = valid_hex(uci:get("flux", "theme", "primary_color"), "#0f766e")
+local theme_bg_light = valid_hex(uci:get("flux", "theme", "background_light"), "#f7f8fb")
+local theme_bg_dark = valid_hex(uci:get("flux", "theme", "background_dark"), "#101418")
+local theme_glass = clamp_number(uci:get("flux", "theme", "glass_opacity"), 0.72, 0.35, 0.95)
 local function split_path(path)
   local parts = {}
 
@@ -173,6 +210,17 @@ end
 local function path_is_active(path)
   return current_path == path or current_path:sub(1, #path + 1) == path .. "/"
 end
+local function bottom_is_active(path)
+  if current_path == "admin/system/flux" then
+    return false
+  end
+
+  if not path or path == "" or path == "/" then
+    return current_path == "" or current_path == nil
+  end
+
+  return path_is_active(path)
+end
 local function render_sidebar_tree(node, prefix, depth)
   local children = sorted_children(node)
 
@@ -210,8 +258,9 @@ local function render_bottom_slot(slot, config)
 
   local menu_node = pathnode(config.path)
   local has_dropdown = config.dropdown == "1" and #sorted_children(menu_node) > 0
+  local active = bottom_is_active(config.path)
 
-  write('<div class="flux-bottom-item' .. (has_dropdown and ' has-menu' or '') .. '" data-flux-bottom-item>')
+  write('<div class="flux-bottom-item' .. (has_dropdown and ' has-menu' or '') .. (active and ' is-active' or '') .. '" data-flux-bottom-item>')
   write('<a class="flux-bottom-link" href="' .. pcdata(pathurl(config.path)) .. '" data-flux-bottom-link data-icon="' .. pcdata(config.icon) .. '">')
   write('<span class="flux-bottom-icon"></span><span class="flux-bottom-label">' .. pcdata(translate(config.label)) .. '</span>')
   write('</a>')
@@ -229,13 +278,31 @@ local flux_slot2 = slot_config("slot2")
 local flux_slot3 = slot_config("slot3")
 -%>
 <!DOCTYPE html>
-<html lang="<%=luci.i18n.context.lang%>">
+<html lang="<%=luci.i18n.context.lang%>" data-flux-theme="<%=pcdata(theme_mode)%>">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="format-detection" content="telephone=no">
   <title><%=striptags(hostname)%> - LuCI</title>
   <link rel="stylesheet" href="<%=media%>/cascade.css">
+  <style>
+    :root {
+      --flux-bg: <%=theme_mode == "dark" and theme_bg_dark or theme_bg_light%>;
+      --flux-bg-rgb: <%=theme_mode == "dark" and hex_rgb(theme_bg_dark) or hex_rgb(theme_bg_light)%>;
+      --flux-accent: <%=theme_primary%>;
+      --flux-accent-rgb: <%=hex_rgb(theme_primary)%>;
+      --flux-accent-strong: color-mix(in srgb, <%=theme_primary%> 82%, black);
+      --flux-glass-opacity: <%=theme_glass%>;
+    }
+    <% if theme_mode == "auto" then -%>
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --flux-bg: <%=theme_bg_dark%>;
+        --flux-bg-rgb: <%=hex_rgb(theme_bg_dark)%>;
+      }
+    }
+    <% end -%>
+  </style>
   <script src="<%=url('admin/translations', luci.i18n.context.lang)%>?v=<%=ver.luciversion%>"></script>
   <script src="<%=resource%>/xhr.js"></script>
   <script src="<%=resource%>/cbi.js"></script>
@@ -256,7 +323,7 @@ local flux_slot3 = slot_config("slot3")
       <% render_bottom_slot("slot1", flux_slot1) %>
       <% render_bottom_slot("slot2", flux_slot2) %>
       <% render_bottom_slot("slot3", flux_slot3) %>
-      <div class="flux-bottom-item" data-flux-bottom-item>
+      <div class="flux-bottom-item<%=current_path == "admin/system/flux" and " is-active" or ""%>" data-flux-bottom-item>
         <a class="flux-bottom-link" href="<%=dispatcher.build_url("admin", "system", "flux")%>" data-flux-bottom-link data-icon="all">
           <span class="flux-bottom-icon"></span><span class="flux-bottom-label"><%:All%></span>
         </a>
