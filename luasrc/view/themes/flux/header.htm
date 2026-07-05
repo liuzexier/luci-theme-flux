@@ -5,7 +5,7 @@ local uci = require "luci.model.uci".cursor()
 local dispatcher = require "luci.dispatcher"
 local hostname = sys.hostname() or "OpenWrt"
 local request = dispatcher.context.request
-local category = request and request[2] or nil
+local current_path = request and table.concat(request, "/") or ""
 local menu_root = dispatcher.menu_json() or {}
 local admin_tree = menu_root.children and menu_root.children.admin or menu_root
 local flux_defaults = {
@@ -169,6 +169,39 @@ local function render_menu_tree(node, prefix, depth)
 
   write('</ul>')
 end
+local function path_is_active(path)
+  return current_path == path or current_path:sub(1, #path + 1) == path .. "/"
+end
+local function render_sidebar_tree(node, prefix, depth)
+  local children = sorted_children(node)
+
+  if #children == 0 then
+    return
+  end
+
+  write('<ul class="flux-sidebar-list flux-depth-' .. tostring(depth or 0) .. '">')
+
+  for _, child in ipairs(children) do
+    local item = child.node
+    local child_path = prefix and (prefix .. "/" .. child.name) or child.name
+    local branch = has_children(item)
+    local active = path_is_active(child_path)
+    local title = pcdata(translate(item.title))
+
+    if branch then
+      write('<li class="flux-sidebar-branch' .. (active and ' active' or '') .. '"><details' .. (active and ' open' or '') .. '>')
+      write('<summary>' .. title .. '</summary>')
+      render_sidebar_tree(item, child_path, (depth or 0) + 1)
+      write('</details></li>')
+    else
+      write('<li class="flux-sidebar-leaf' .. (active and ' active' or '') .. '">')
+      write('<a href="' .. pcdata(pathurl(child_path)) .. '">' .. title .. '</a>')
+      write('</li>')
+    end
+  end
+
+  write('</ul>')
+end
 local function render_bottom_slot(slot, config)
   if config.enabled == "0" then
     return
@@ -231,33 +264,8 @@ local flux_slot3 = slot_config("slot3")
     <div class="flux-layout">
       <aside class="flux-sidebar">
         <nav id="mainmenu" aria-label="<%:Main navigation%>">
-          <ul>
-            <% for _, child in ipairs(sorted_children(admin_tree)) do
-              local v = child.name
-              local nnode = child.node
-            -%>
-              <li class="<%=category == v and 'active' or ''%>">
-                <a href="<%=dispatcher.build_url("admin", v)%>"><%=pcdata(translate(nnode.title))%></a>
-              </li>
-            <% end -%>
-          </ul>
+          <% render_sidebar_tree(admin_tree, "admin", 0) %>
         </nav>
-
-        <% local cattree = category and admin_tree.children and admin_tree.children[category] or nil
-          if #sorted_children(cattree) > 0 then -%>
-        <nav id="modemenu" aria-label="<%:Section navigation%>">
-          <ul>
-            <% for _, child in ipairs(sorted_children(cattree)) do
-              local v = child.name
-              local nnode = child.node
-            -%>
-              <li class="<%=request and request[3] == v and 'active' or ''%>">
-                <a href="<%=dispatcher.build_url("admin", category, v)%>"><%=pcdata(translate(nnode.title))%></a>
-              </li>
-            <% end -%>
-          </ul>
-        </nav>
-        <% end -%>
       </aside>
 
       <main class="flux-content">

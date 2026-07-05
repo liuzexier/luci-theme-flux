@@ -350,49 +350,83 @@ a:focus-visible {
   padding-left: 52px;
 }
 
-#mainmenu,
-#modemenu {
+#mainmenu {
   margin: 0;
   padding: 0;
 }
 
-#mainmenu ul,
-#modemenu ul {
+#mainmenu ul {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-#mainmenu li,
-#modemenu li {
+#mainmenu li {
   margin: 2px 0;
+  min-width: 0;
 }
 
 #mainmenu a,
-#modemenu a {
+#mainmenu summary {
   align-items: center;
   border-radius: var(--flux-radius);
   color: var(--flux-text);
   display: flex;
+  font-weight: 600;
   min-height: 38px;
   padding: 8px 10px;
+  list-style: none;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#mainmenu summary {
+  cursor: pointer;
+}
+
+#mainmenu summary::-webkit-details-marker {
+  display: none;
+}
+
+#mainmenu summary::after {
+  color: var(--flux-muted);
+  content: "⌄";
+  margin-left: auto;
+  padding-left: 10px;
+}
+
+#mainmenu details[open] > summary::after {
+  content: "⌃";
 }
 
 #mainmenu .active > a,
-#modemenu .active > a,
+#mainmenu .active > details > summary,
 #mainmenu a:hover,
-#modemenu a:hover,
 #mainmenu a:focus-visible,
-#modemenu a:focus-visible {
+#mainmenu summary:hover,
+#mainmenu summary:focus-visible {
   background: var(--flux-surface-strong);
   color: var(--flux-accent-strong);
   text-decoration: none;
 }
 
-#mainmenu ul ul a {
+#mainmenu ul ul a,
+#mainmenu ul ul summary {
   color: var(--flux-muted);
   font-size: 13px;
   padding-left: 20px;
+}
+
+#mainmenu ul ul ul a,
+#mainmenu ul ul ul summary {
+  padding-left: 32px;
+}
+
+#mainmenu ul ul ul ul a,
+#mainmenu ul ul ul ul summary {
+  padding-left: 44px;
 }
 
 h1,
