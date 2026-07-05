@@ -33,6 +33,7 @@ find_sdk_name() {
 copy_theme_into_sdk() {
   local sdk="$1"
   local dest="$sdk/feeds/luci/themes/luci-theme-flux"
+  local package_link="$sdk/package/feeds/luci/luci-theme-flux"
 
   rm -rf "$dest"
   mkdir -p "$dest"
@@ -44,6 +45,10 @@ copy_theme_into_sdk() {
     --exclude "dist" \
     --exclude "preview" \
     "$ROOT_DIR/" "$dest/"
+
+  mkdir -p "$sdk/package/feeds/luci"
+  rm -rf "$package_link"
+  ln -s "../../../feeds/luci/themes/luci-theme-flux" "$package_link"
 }
 
 build_target() {
@@ -81,11 +86,11 @@ build_target() {
   echo "==> Copying luci-theme-flux into LuCI feed"
   copy_theme_into_sdk "$sdk"
 
-  echo "==> Installing luci-theme-flux feed package"
-  (cd "$sdk" && ./scripts/feeds install luci-theme-flux)
+  echo "==> Enabling luci-theme-flux"
+  (cd "$sdk" && printf '%s\n' 'CONFIG_PACKAGE_luci-theme-flux=m' >> .config && make defconfig)
 
   echo "==> Compiling luci-theme-flux for $target"
-  (cd "$sdk" && make package/feeds/luci/luci-theme-flux/compile V=s)
+  (cd "$sdk" && TERM=xterm make package/feeds/luci/luci-theme-flux/compile V=s)
 
   echo "==> Collecting ipk artifacts"
   mkdir -p "$OUT_DIR/$target_slug"
