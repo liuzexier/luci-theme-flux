@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no">
+  <title>luci-theme-flux preview</title>
+  <link rel="stylesheet" href="../htdocs/luci-static/flux/cascade.css">
+  <script src="../htdocs/luci-static/flux/mobile.js" defer></script>
+</head>
+<body>
+  <div class="flux-shell">
+    <header class="flux-header">
+      <a class="flux-brand" href="#">
+        <img src="../htdocs/luci-static/flux/logo.svg" alt="">
+        <span>OpenWrt Flux</span>
+      </a>
+    </header>
+
+    <div class="flux-backdrop" data-flux-backdrop></div>
+
+    <nav class="flux-bottom-nav" aria-label="快捷导航">
+      <div class="flux-bottom-item">
+        <a class="flux-bottom-link" href="#" data-flux-bottom-link data-icon="home">
+          <span class="flux-bottom-icon"></span><span class="flux-bottom-label">Home</span>
+        </a>
+      </div>
+
+      <div class="flux-bottom-item has-menu" data-flux-bottom-item>
+        <a class="flux-bottom-link" href="#services" data-flux-bottom-link data-icon="services">
+          <span class="flux-bottom-icon"></span><span class="flux-bottom-label">服务</span>
+        </a>
+        <div class="flux-bottom-panel" data-flux-bottom-panel>
+          <ul class="flux-bottom-list flux-depth-0">
+            <li><a href="#adblock">应用过滤</a></li>
+            <li><a href="#alist">易有云文件管理器</a></li>
+            <li><a href="#home-assistant">Home Assistant</a></li>
+            <li><a href="#fastnet">FastNet</a></li>
+            <li><a href="#openclash">OpenClash</a></li>
+            <li><a href="#ddns">动态 DNS</a></li>
+            <li><a href="#terminal">终端</a></li>
+            <li><a href="#upnp">UPnP IGD 和 PCP</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flux-bottom-item has-menu" data-flux-bottom-item>
+        <a class="flux-bottom-link" href="#network" data-flux-bottom-link data-icon="network">
+          <span class="flux-bottom-icon"></span><span class="flux-bottom-label">网络</span>
+        </a>
+        <div class="flux-bottom-panel" data-flux-bottom-panel>
+          <ul class="flux-bottom-list flux-depth-0">
+            <li><a href="#interfaces">接口</a></li>
+            <li><a href="#wireless">网口配置</a></li>
+            <li><a href="#routes">路由</a></li>
+            <li><a href="#dhcp">DHCP/DNS</a></li>
+            <li><a href="#diagnostics">网络诊断</a></li>
+            <li><a href="#firewall">防火墙</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flux-bottom-item" data-flux-bottom-item>
+        <a class="flux-bottom-link" href="flux-settings.html" data-flux-bottom-link data-icon="all">
+          <span class="flux-bottom-icon"></span><span class="flux-bottom-label">全部</span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="flux-layout">
+      <aside class="flux-sidebar">
+        <nav id="mainmenu" aria-label="主导航">
+          <ul>
+            <li class="active"><a href="#">状态</a></li>
+            <li><a href="#">系统</a></li>
+            <li><a href="#">服务</a></li>
+            <li><a href="#">网络</a></li>
+            <li><a href="#">统计</a></li>
+            <li><a href="#">退出</a></li>
+          </ul>
+        </nav>
+
+        <nav id="modemenu" aria-label="分区导航">
+          <ul>
+            <li class="active"><a href="#">概览</a></li>
+            <li><a href="#">路由表</a></li>
+            <li><a href="#">系统日志</a></li>
+            <li><a href="#">内核日志</a></li>
+            <li><a href="#">实时信息</a></li>
+          </ul>
+        </nav>
+      </aside>
+
+      <main class="flux-content">
+        <div class="flux-main">
+          <h1>状态概览</h1>
+
+          <div class="alert-message warning">
+            这是一张本地预览页，用来检查主题在桌面和移动端下的布局表现。
+          </div>
+
+          <section class="cbi-map">
+            <h2>系统</h2>
+            <div class="cbi-value">
+              <label class="cbi-value-title">主机名</label>
+              <div class="cbi-value-field">
+                <input type="text" value="OpenWrt-Flux">
+              </div>
+            </div>
+            <div class="cbi-value">
+              <label class="cbi-value-title">时区</label>
+              <div class="cbi-value-field">
+                <select>
+                  <option>Asia/Shanghai</option>
+                  <option>UTC</option>
+                  <option>Asia/Tokyo</option>
+                </select>
+              </div>
+            </div>
+            <div class="cbi-value">
+              <label class="cbi-value-title">备注</label>
+              <div class="cbi-value-field">
+                <textarea>移动端表单应该有足够大的点击区域，并且不会挤出屏幕。</textarea>
+              </div>
+            </div>
+          </section>
+
+          <section class="cbi-section">
+            <h2>接口</h2>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>接口</th>
+                  <th>协议</th>
+                  <th>地址</th>
+                  <th>接收</th>
+                  <th>发送</th>
+                  <th>状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>lan</td>
+                  <td>Static</td>
+                  <td>192.168.1.1/24</td>
+                  <td>128.4 MB</td>
+                  <td>96.7 MB</td>
+                  <td>已连接</td>
+                  <td><button class="cbi-button">编辑</button></td>
+                </tr>
+                <tr>
+                  <td>wan</td>
+                  <td>DHCP</td>
+                  <td>10.0.0.24/24</td>
+                  <td>2.4 GB</td>
+                  <td>418.2 MB</td>
+                  <td>已连接</td>
+                  <td><button class="cbi-button">重连</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <ul class="tabs">
+            <li class="active"><a href="#">基础设置</a></li>
+            <li><a href="#">高级设置</a></li>
+            <li><a href="#">物理设置</a></li>
+            <li><a href="#">防火墙设置</a></li>
+          </ul>
+
+          <div class="cbi-page-actions">
+            <button class="cbi-button">重置</button>
+            <button class="cbi-button cbi-button-positive">保存并应用</button>
+            <button class="cbi-button cbi-button-negative">删除</button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

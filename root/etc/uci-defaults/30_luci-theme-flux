@@ -1,0 +1,27 @@
+#!/bin/sh
+
+uci -q batch <<-EOF >/dev/null
+	set luci.themes.Flux=/luci-static/flux
+	commit luci
+	set flux.slot1=menu
+	set flux.slot1.enabled=1
+	set flux.slot1.label=Home
+	set flux.slot1.icon=home
+	set flux.slot1.path=/
+	set flux.slot1.dropdown=0
+	set flux.slot2=menu
+	set flux.slot2.enabled=1
+	set flux.slot2.label=服务
+	set flux.slot2.icon=services
+	set flux.slot2.path=admin/services
+	set flux.slot2.dropdown=1
+	set flux.slot3=menu
+	set flux.slot3.enabled=1
+	set flux.slot3.label=网络
+	set flux.slot3.icon=network
+	set flux.slot3.path=admin/network
+	set flux.slot3.dropdown=1
+	commit flux
+EOF
+
+exit 0

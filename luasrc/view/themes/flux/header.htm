@@ -1,0 +1,178 @@
+<%
+local sys = require "luci.sys"
+local uci = require "luci.model.uci".cursor()
+local dispatcher = require "luci.dispatcher"
+local hostname = sys.hostname() or "OpenWrt"
+local request = dispatcher.context.request
+local category = request and request[1] or nil
+local tree = dispatcher.node()
+local cattree = category and dispatcher.node(category) or nil
+local flux_defaults = {
+  slot1 = { label = "Home", icon = "home", path = "/", dropdown = "0" },
+  slot2 = { label = "Services", icon = "services", path = "admin/services", dropdown = "1" },
+  slot3 = { label = "Network", icon = "network", path = "admin/network", dropdown = "1" }
+}
+local function nodeurl(prefix, name)
+  if prefix then
+    return dispatcher.build_url(prefix, name)
+  end
+
+  return dispatcher.build_url(name)
+end
+local function split_path(path)
+  local parts = {}
+
+  for part in tostring(path or ""):gmatch("[^/]+") do
+    parts[#parts + 1] = part
+  end
+
+  return parts
+end
+local function pathurl(path)
+  if not path or path == "" or path == "/" then
+    return dispatcher.build_url()
+  end
+
+  if path:sub(1, 1) == "/" then
+    return path
+  end
+
+  return dispatcher.build_url(unpack(split_path(path)))
+end
+local function pathnode(path)
+  local parts = split_path(path)
+
+  if #parts == 0 then
+    return tree
+  end
+
+  return dispatcher.node(unpack(parts))
+end
+local function slot_config(slot)
+  local fallback = flux_defaults[slot] or flux_defaults.slot1
+
+  return {
+    enabled = uci:get("flux", slot, "enabled") or "1",
+    label = uci:get("flux", slot, "label") or fallback.label,
+    icon = uci:get("flux", slot, "icon") or fallback.icon,
+    path = uci:get("flux", slot, "path") or fallback.path,
+    dropdown = uci:get("flux", slot, "dropdown") or fallback.dropdown
+  }
+end
+local function render_menu_tree(node, prefix, depth)
+  if not node or not node.children or #node.children == 0 then
+    return
+  end
+
+  write('<ul class="flux-bottom-list flux-depth-' .. tostring(depth or 0) .. '">')
+
+  for _, child in ipairs(node.children) do
+    local item = node.nodes and node.nodes[child]
+
+    if item and item.title and item.target then
+      local child_path = prefix and (prefix .. "/" .. child) or child
+
+      write('<li>')
+      write('<a href="' .. pcdata(pathurl(child_path)) .. '">' .. pcdata(translate(item.title)) .. '</a>')
+      render_menu_tree(item, child_path, (depth or 0) + 1)
+      write('</li>')
+    end
+  end
+
+  write('</ul>')
+end
+local function render_bottom_slot(slot, config)
+  if config.enabled == "0" then
+    return
+  end
+
+  local menu_node = pathnode(config.path)
+  local has_dropdown = config.dropdown == "1" and menu_node and menu_node.children and #menu_node.children > 0
+
+  write('<div class="flux-bottom-item' .. (has_dropdown and ' has-menu' or '') .. '" data-flux-bottom-item>')
+  write('<a class="flux-bottom-link" href="' .. pcdata(pathurl(config.path)) .. '" data-flux-bottom-link data-icon="' .. pcdata(config.icon) .. '">')
+  write('<span class="flux-bottom-icon"></span><span class="flux-bottom-label">' .. pcdata(translate(config.label)) .. '</span>')
+  write('</a>')
+
+  if has_dropdown then
+    write('<div class="flux-bottom-panel" data-flux-bottom-panel>')
+    render_menu_tree(menu_node, config.path, 0)
+    write('</div>')
+  end
+
+  write('</div>')
+end
+local flux_slot1 = slot_config("slot1")
+local flux_slot2 = slot_config("slot2")
+local flux_slot3 = slot_config("slot3")
+-%>
+<!DOCTYPE html>
+<html lang="<%=luci.i18n.context.lang%>">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no">
+  <title><%=striptags(hostname)%> - LuCI</title>
+  <link rel="stylesheet" href="<%=media%>/cascade.css">
+  <script src="<%=resource%>/xhr.js"></script>
+  <script src="<%=resource%>/cbi.js"></script>
+  <script src="<%=media%>/mobile.js" defer></script>
+</head>
+<body class="lang_<%=luci.i18n.context.lang%>">
+  <div class="flux-shell">
+    <header class="flux-header">
+      <a class="flux-brand" href="<%=dispatcher.build_url()%>">
+        <img src="<%=media%>/logo.svg" alt="">
+        <span><%=striptags(hostname)%></span>
+      </a>
+    </header>
+
+    <div class="flux-backdrop" data-flux-backdrop></div>
+
+    <nav class="flux-bottom-nav" aria-label="<%:Quick navigation%>">
+      <% render_bottom_slot("slot1", flux_slot1) %>
+      <% render_bottom_slot("slot2", flux_slot2) %>
+      <% render_bottom_slot("slot3", flux_slot3) %>
+      <div class="flux-bottom-item" data-flux-bottom-item>
+        <a class="flux-bottom-link" href="<%=dispatcher.build_url("admin", "system", "flux")%>" data-flux-bottom-link data-icon="all">
+          <span class="flux-bottom-icon"></span><span class="flux-bottom-label"><%:All%></span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="flux-layout">
+      <aside class="flux-sidebar">
+        <nav id="mainmenu" aria-label="<%:Main navigation%>">
+          <ul>
+            <% if tree then for _, v in ipairs(tree.children or {}) do
+              local nnode = tree.nodes[v]
+              if nnode and nnode.title and nnode.target then
+            -%>
+              <li class="<%=category == v and 'active' or ''%>">
+                <a href="<%=nodeurl(nil, v)%>"><%=pcdata(translate(nnode.title))%></a>
+              </li>
+            <% end end end -%>
+          </ul>
+        </nav>
+
+        <% if cattree and cattree.children and #cattree.children > 0 then -%>
+        <nav id="modemenu" aria-label="<%:Section navigation%>">
+          <ul>
+            <% for _, v in ipairs(cattree.children) do
+              local nnode = cattree.nodes[v]
+              if nnode and nnode.title and nnode.target then
+            -%>
+              <li class="<%=request and request[2] == v and 'active' or ''%>">
+                <a href="<%=nodeurl(category, v)%>"><%=pcdata(translate(nnode.title))%></a>
+              </li>
+            <% end end -%>
+          </ul>
+        </nav>
+        <% end -%>
+      </aside>
+
+      <main class="flux-content">
+        <div class="flux-main">
+          <noscript>
+            <div class="alert-message warning"><%:JavaScript is required for LuCI to work properly.%></div>
+          </noscript>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no">
+  <title>全部</title>
+  <link rel="stylesheet" href="../htdocs/luci-static/flux/cascade.css">
+  <script src="../htdocs/luci-static/flux/mobile.js" defer></script>
+</head>
+<body>
+  <div class="flux-shell">
+    <header class="flux-header">
+      <a class="flux-brand" href="index.html">
+        <img src="../htdocs/luci-static/flux/logo.svg" alt="">
+        <span>OpenWrt Flux</span>
+      </a>
+    </header>
+
+    <nav class="flux-bottom-nav" aria-label="快捷导航">
+      <div class="flux-bottom-item">
+        <a class="flux-bottom-link" href="index.html" data-flux-bottom-link data-icon="home">
+          <span class="flux-bottom-icon"></span><span class="flux-bottom-label">Home</span>
+        </a>
+      </div>
+
+      <div class="flux-bottom-item has-menu" data-flux-bottom-item>
+        <a class="flux-bottom-link" href="#services" data-flux-bottom-link data-icon="services">
+          <span class="flux-bottom-icon"></span><span class="flux-bottom-label">服务</span>
+        </a>
+        <div class="flux-bottom-panel" data-flux-bottom-panel>
+          <ul class="flux-bottom-list flux-depth-0">
+            <li><a href="#adblock">应用过滤</a></li>
+            <li><a href="#alist">易有云文件管理器移动端超长名称示例</a></li>
+            <li><a href="#openclash">OpenClash</a></li>
+            <li><a href="#ddns">动态 DNS</a></li>
+            <li><a href="#terminal">终端</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flux-bottom-item has-menu" data-flux-bottom-item>
+        <a class="flux-bottom-link" href="#network" data-flux-bottom-link data-icon="network">
+          <span class="flux-bottom-icon"></span><span class="flux-bottom-label">网络</span>
+        </a>
+        <div class="flux-bottom-panel" data-flux-bottom-panel>
+          <ul class="flux-bottom-list flux-depth-0">
+            <li><a href="#interfaces">接口</a></li>
+            <li><a href="#routes">路由</a></li>
+            <li><a href="#dhcp">DHCP/DNS</a></li>
+            <li><a href="#firewall">防火墙</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flux-bottom-item">
+        <a class="flux-bottom-link" href="flux-settings.html" data-flux-bottom-link data-icon="all">
+          <span class="flux-bottom-icon"></span><span class="flux-bottom-label">全部</span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="flux-layout">
+      <aside class="flux-sidebar">
+        <nav id="mainmenu" aria-label="主导航">
+          <ul>
+            <li><a href="index.html">状态</a></li>
+            <li class="active"><a href="flux-settings.html">系统</a></li>
+            <li><a href="#">服务</a></li>
+            <li><a href="#">网络</a></li>
+          </ul>
+        </nav>
+      </aside>
+
+      <main class="flux-content">
+        <div class="flux-main">
+          <h1>全部</h1>
+          <section class="cbi-section">
+            <h2>全部菜单</h2>
+            <div class="flux-menu-directory">
+              <details open>
+                <summary>状态</summary>
+                <ul>
+                  <li><a href="#overview">概览</a></li>
+                  <li><a href="#routes">路由表</a></li>
+                  <li><a href="#logs">系统日志</a></li>
+                  <li><a href="#realtime">实时信息</a></li>
+                </ul>
+              </details>
+              <details>
+                <summary>系统</summary>
+                <ul>
+                  <li><a href="#admin">管理权</a></li>
+                  <li><a href="#software">软件包</a></li>
+                  <li><a href="#startup">启动项</a></li>
+                  <li><a href="flux-settings.html">Flux 主题设置</a></li>
+                </ul>
+              </details>
+              <details>
+                <summary>服务</summary>
+                <ul>
+                  <li><a href="#adblock">应用过滤</a></li>
+                  <li><a href="#openclash">OpenClash</a></li>
+                  <li><a href="#ddns">动态 DNS</a></li>
+                  <li><a href="#terminal">终端</a></li>
+                </ul>
+              </details>
+              <details>
+                <summary>网络</summary>
+                <ul>
+                  <li><a href="#interfaces">接口</a></li>
+                  <li><a href="#routes">路由</a></li>
+                  <li><a href="#dhcp">DHCP/DNS</a></li>
+                  <li><a href="#firewall">防火墙</a></li>
+                </ul>
+              </details>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

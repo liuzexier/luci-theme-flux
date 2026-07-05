@@ -1,0 +1,29 @@
+<%
+local dispatcher = require "luci.dispatcher"
+local admin_tree = dispatcher.node("admin")
+
+local function menu_url(...)
+  return dispatcher.build_url(...)
+end
+-%>
+
+<div class="flux-menu-directory">
+  <% if admin_tree and admin_tree.children then for _, first in ipairs(admin_tree.children) do
+    local first_node = admin_tree.nodes and admin_tree.nodes[first]
+    if first_node and first_node.title and first_node.target then
+  -%>
+    <details>
+      <summary><%=pcdata(translate(first_node.title))%></summary>
+      <ul>
+        <% if first_node.children then for _, second in ipairs(first_node.children) do
+          local second_node = first_node.nodes and first_node.nodes[second]
+          if second_node and second_node.title and second_node.target then
+        -%>
+          <li>
+            <a href="<%=menu_url("admin", first, second)%>"><%=pcdata(translate(second_node.title))%></a>
+          </li>
+        <% end end end -%>
+      </ul>
+    </details>
+  <% end end end -%>
+</div>
