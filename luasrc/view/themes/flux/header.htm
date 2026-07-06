@@ -211,7 +211,7 @@ local function path_is_active(path)
   return current_path == path or current_path:sub(1, #path + 1) == path .. "/"
 end
 local function bottom_is_active(path)
-  if current_path == "admin/system/flux" then
+  if current_path == "admin/system/flux-menu" then
     return false
   end
 
@@ -323,9 +323,9 @@ local flux_slot3 = slot_config("slot3")
       <% render_bottom_slot("slot1", flux_slot1) %>
       <% render_bottom_slot("slot2", flux_slot2) %>
       <% render_bottom_slot("slot3", flux_slot3) %>
-      <div class="flux-bottom-item<%=current_path == "admin/system/flux" and " is-active" or ""%>" data-flux-bottom-item>
-        <a class="flux-bottom-link" href="<%=dispatcher.build_url("admin", "system", "flux")%>" data-flux-bottom-link data-icon="all">
-          <span class="flux-bottom-icon"></span><span class="flux-bottom-label"><%:All%></span>
+      <div class="flux-bottom-item<%=current_path == "admin/system/flux-menu" and " is-active" or ""%>" data-flux-bottom-item>
+        <a class="flux-bottom-link" href="<%=dispatcher.build_url("admin", "system", "flux-menu")%>" data-flux-bottom-link data-icon="all">
+          <span class="flux-bottom-icon"></span><span class="flux-bottom-label"><%:全部%></span>
         </a>
       </div>
     </nav>

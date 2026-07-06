@@ -6,7 +6,7 @@ LUCI_PKGARCH:=all
 
 PKG_NAME:=luci-theme-flux
 PKG_VERSION:=0.1.0
-PKG_RELEASE:=9
+PKG_RELEASE:=10
 PKG_LICENSE:=MIT
 
 include ../../luci.mk
