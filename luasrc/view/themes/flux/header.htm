@@ -7,6 +7,7 @@ local ver = require "luci.version"
 local hostname = sys.hostname() or "OpenWrt"
 local request = dispatcher.context.request
 local current_path = request and table.concat(request, "/") or ""
+local logged_in = dispatcher.context.authsession ~= nil
 local menu_root = dispatcher.menu_json() or {}
 local admin_tree = menu_root.children and menu_root.children.admin or menu_root
 local flux_defaults = {
@@ -308,7 +309,7 @@ local flux_slot3 = slot_config("slot3")
   <script src="<%=resource%>/cbi.js"></script>
   <script src="<%=media%>/mobile.js" defer></script>
 </head>
-<body class="lang_<%=luci.i18n.context.lang%>">
+<body class="lang_<%=luci.i18n.context.lang%><%=logged_in and " logged-in" or ""%>">
   <div class="flux-shell">
     <header class="flux-header">
       <a class="flux-brand" href="<%=dispatcher.build_url()%>">
@@ -317,6 +318,7 @@ local flux_slot3 = slot_config("slot3")
       </a>
     </header>
 
+    <% if logged_in then -%>
     <div class="flux-backdrop" data-flux-backdrop></div>
 
     <nav class="flux-bottom-nav" aria-label="<%:Quick navigation%>">
@@ -329,13 +331,16 @@ local flux_slot3 = slot_config("slot3")
         </a>
       </div>
     </nav>
+    <% end -%>
 
     <div class="flux-layout">
+      <% if logged_in then -%>
       <aside class="flux-sidebar">
         <nav id="mainmenu" aria-label="<%:Main navigation%>">
           <% render_sidebar_tree(admin_tree, "admin", 0) %>
         </nav>
       </aside>
+      <% end -%>
 
       <main class="flux-content" id="maincontent">
         <div class="flux-main">

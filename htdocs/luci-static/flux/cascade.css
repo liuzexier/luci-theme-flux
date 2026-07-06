@@ -138,6 +138,10 @@ a:focus-visible {
   min-height: calc(100vh - var(--flux-header-height));
 }
 
+body:not(.logged-in) .flux-layout {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .flux-sidebar {
   -webkit-backdrop-filter: blur(24px) saturate(1.45);
   backdrop-filter: blur(24px) saturate(1.45);
