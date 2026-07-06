@@ -203,6 +203,7 @@ a:focus-visible {
 
 .flux-bottom-link {
   align-items: center;
+  border-radius: 18px;
   color: var(--flux-muted);
   display: flex;
   flex-direction: column;
@@ -330,6 +331,7 @@ a:focus-visible {
   position: absolute;
   transform: translateX(-50%);
   width: min(320px, 100vw);
+  z-index: 140;
 }
 
 .flux-bottom-item.is-open .flux-bottom-panel {
@@ -840,7 +842,7 @@ th,
     bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
     height: 68px;
     left: 12px;
-    overflow: hidden;
+    overflow: visible;
     right: 12px;
   }
 
