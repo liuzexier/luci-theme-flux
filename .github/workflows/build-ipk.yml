@@ -12,6 +12,9 @@ on:
       - main
       - master
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-24.04
@@ -63,3 +66,62 @@ jobs:
           name: luci-theme-flux-${{ matrix.target == 'x86/64' && 'x86-64' || 'mediatek-filogic' }}
           path: dist/**/*.ipk
           if-no-files-found: error
+
+  release:
+    runs-on: ubuntu-24.04
+    needs: build
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read package version
+        id: package
+        run: |
+          version="$(sed -n 's/^PKG_VERSION:=//p' Makefile)"
+          release="$(sed -n 's/^PKG_RELEASE:=//p' Makefile)"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "release=${release}" >> "$GITHUB_OUTPUT"
+          echo "tag=v${version}-r${release}" >> "$GITHUB_OUTPUT"
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+
+      - name: Prepare release assets
+        run: |
+          set -eu
+          mkdir -p release
+
+          first_ipk="$(find release-artifacts -type f -name '*.ipk' | sort | head -n 1)"
+          if [ -z "$first_ipk" ]; then
+            echo "No IPK files found" >&2
+            exit 1
+          fi
+
+          cp "$first_ipk" "release/luci-theme-flux_${{ steps.package.outputs.version }}-r${{ steps.package.outputs.release }}_all.ipk"
+
+          for artifact in release-artifacts/*; do
+            [ -d "$artifact" ] || continue
+            name="$(basename "$artifact")"
+            tar -C "$artifact" -czf "release/${name}.tar.gz" .
+          done
+
+          (cd release && sha256sum * > SHA256SUMS)
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.package.outputs.tag }}
+        run: |
+          set -eu
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" release/* --clobber
+          else
+            gh release create "$TAG" release/* \
+              --target "$GITHUB_SHA" \
+              --title "luci-theme-flux $TAG" \
+              --notes "OpenWrt LuCI Flux theme package. The *_all.ipk package is architecture independent; target-specific archives are attached for traceability."
+          fi
