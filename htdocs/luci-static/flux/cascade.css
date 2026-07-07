@@ -132,6 +132,64 @@ a:focus-visible {
   white-space: nowrap;
 }
 
+#app .page-container a[href="https://www.istoreos.com/"] {
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  backdrop-filter: blur(18px) saturate(1.35);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.48)),
+    rgba(var(--flux-surface-rgb), 0.88) !important;
+  border: 1px solid rgba(148, 163, 184, 0.32) !important;
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.10);
+  color: var(--flux-text) !important;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 7px 13px;
+}
+
+#app .page-container .model_btn {
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  backdrop-filter: blur(18px) saturate(1.35);
+  background: rgba(var(--flux-surface-rgb), 0.82);
+  border: 1px solid rgba(148, 163, 184, 0.30);
+  border-radius: 12px;
+  color: var(--flux-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  min-width: 36px;
+}
+
+#app .page-container .model_btn svg,
+#app .page-container .model_btn svg * {
+  color: currentColor !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
+
+html[data-flux-theme="dark"] #app .page-container a[href="https://www.istoreos.com/"],
+html[data-flux-theme="dark"] #app .page-container .model_btn {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.04)),
+    rgba(var(--flux-surface-rgb), 0.84) !important;
+  border-color: rgba(148, 163, 184, 0.24) !important;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-flux-theme="light"]) #app .page-container a[href="https://www.istoreos.com/"],
+  html:not([data-flux-theme="light"]) #app .page-container .model_btn {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.04)),
+      rgba(var(--flux-surface-rgb), 0.84) !important;
+    border-color: rgba(148, 163, 184, 0.24) !important;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
+  }
+}
+
 .flux-layout {
   display: grid;
   grid-template-columns: 280px minmax(0, 1fr);
