@@ -714,6 +714,63 @@ button,
   color: rgba(255, 255, 255, 0.86);
 }
 
+.cbi-page-actions .cbi-dropdown.cbi-button-apply {
+  align-items: stretch;
+  display: inline-grid;
+  gap: 0;
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-width: 168px;
+  overflow: visible;
+  padding: 0;
+}
+
+.cbi-page-actions .cbi-dropdown.cbi-button-apply:not([open]) > ul {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  display: block;
+  min-width: 0;
+  position: static;
+  width: auto;
+}
+
+.cbi-page-actions .cbi-dropdown.cbi-button-apply > ul > li {
+  color: inherit;
+  min-height: 40px;
+  padding: 9px 14px;
+}
+
+.cbi-page-actions .cbi-dropdown.cbi-button-apply > .more {
+  display: none !important;
+}
+
+.cbi-page-actions .cbi-dropdown.cbi-button-apply > .open {
+  border-left: 1px solid rgba(255, 255, 255, 0.22);
+  min-width: 38px;
+  padding: 0 10px;
+}
+
+.cbi-page-actions .cbi-dropdown.cbi-button-apply[open] > ul {
+  background: var(--flux-surface);
+  border: 1px solid var(--flux-border);
+  border-radius: var(--flux-radius);
+  bottom: calc(100% + 8px);
+  box-shadow: var(--flux-shadow);
+  color: var(--flux-text);
+  left: auto;
+  min-width: 100%;
+  right: 0;
+}
+
+.cbi-page-actions .cbi-dropdown.cbi-button-apply[open] > ul > li {
+  color: var(--flux-text);
+}
+
+.cbi-page-actions .cbi-dropdown.cbi-button-apply[open] > ul > li:hover,
+.cbi-page-actions .cbi-dropdown.cbi-button-apply[open] > ul > li:focus {
+  background: var(--flux-surface-strong);
+}
+
 .cbi-button-positive,
 .cbi-button-apply,
 .btn-primary {
