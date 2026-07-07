@@ -52,6 +52,7 @@ local theme_primary = valid_hex(uci:get("flux", "theme", "primary_color"), "#0f7
 local theme_bg_light = valid_hex(uci:get("flux", "theme", "background_light"), "#f7f8fb")
 local theme_bg_dark = valid_hex(uci:get("flux", "theme", "background_dark"), "#101418")
 local theme_glass = clamp_number(uci:get("flux", "theme", "glass_opacity"), 0.72, 0.35, 0.95)
+local asset_version = "0.1.0-r12"
 local function split_path(path)
   local parts = {}
 
@@ -285,7 +286,7 @@ local flux_slot3 = slot_config("slot3")
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="format-detection" content="telephone=no">
   <title><%=striptags(hostname)%> - LuCI</title>
-  <link rel="stylesheet" href="<%=media%>/cascade.css">
+  <link rel="stylesheet" href="<%=media%>/cascade.css?v=<%=asset_version%>">
   <style>
     :root {
       --flux-bg: <%=theme_mode == "dark" and theme_bg_dark or theme_bg_light%>;
@@ -305,9 +306,9 @@ local flux_slot3 = slot_config("slot3")
     <% end -%>
   </style>
   <script src="<%=url('admin/translations', luci.i18n.context.lang)%>?v=<%=ver.luciversion%>"></script>
-  <script src="<%=resource%>/xhr.js"></script>
-  <script src="<%=resource%>/cbi.js"></script>
-  <script src="<%=media%>/mobile.js" defer></script>
+  <script src="<%=resource%>/xhr.js?v=<%=asset_version%>"></script>
+  <script src="<%=resource%>/cbi.js?v=<%=asset_version%>"></script>
+  <script src="<%=media%>/mobile.js?v=<%=asset_version%>" defer></script>
 </head>
 <body class="lang_<%=luci.i18n.context.lang%><%=logged_in and " logged-in" or ""%>">
   <div class="flux-shell">
