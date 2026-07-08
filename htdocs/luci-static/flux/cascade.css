@@ -15,6 +15,7 @@
   --flux-glass-opacity: 0.72;
   --flux-glass-bg: rgba(var(--flux-surface-rgb), var(--flux-glass-opacity));
   --flux-glass-border: rgba(148, 163, 184, 0.26);
+  --flux-icon-chevron-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   --flux-radius: 8px;
   --flux-header-height: 56px;
   --flux-bottom-height: 64px;
@@ -360,15 +361,20 @@ body:not(.logged-in) .flux-layout {
 }
 
 .flux-bottom-item.has-menu > .flux-bottom-link::after {
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-top: 4px solid currentColor;
+  background: currentColor;
   content: "";
-  height: 0;
+  height: 14px;
+  -webkit-mask: var(--flux-icon-chevron-down) center / 14px 14px no-repeat;
+  mask: var(--flux-icon-chevron-down) center / 14px 14px no-repeat;
   position: absolute;
   right: calc(50% - 22px);
-  top: 12px;
-  width: 0;
+  top: 9px;
+  transition: transform 160ms ease;
+  width: 14px;
+}
+
+.flux-bottom-item.is-open > .flux-bottom-link::after {
+  transform: rotate(180deg);
 }
 
 .flux-bottom-panel {
@@ -445,13 +451,20 @@ body:not(.logged-in) .flux-layout {
 }
 
 .flux-bottom-list summary::after {
-  color: #98a2b3;
-  content: "⌄";
+  background: currentColor;
+  color: var(--flux-muted);
+  content: "";
   float: right;
+  height: 16px;
+  margin-top: 2px;
+  -webkit-mask: var(--flux-icon-chevron-down) center / 16px 16px no-repeat;
+  mask: var(--flux-icon-chevron-down) center / 16px 16px no-repeat;
+  transition: transform 160ms ease;
+  width: 16px;
 }
 
 .flux-bottom-list details[open] > summary::after {
-  content: "⌃";
+  transform: rotate(180deg);
 }
 
 .flux-bottom-list .flux-bottom-list a,
@@ -510,15 +523,20 @@ body:not(.logged-in) .flux-layout {
 }
 
 #mainmenu summary::after {
+  background: currentColor;
   color: var(--flux-muted);
-  content: "⌄";
-  font-size: 12px;
+  content: "";
+  flex: 0 0 auto;
+  height: 14px;
   margin-left: auto;
-  padding-left: 10px;
+  -webkit-mask: var(--flux-icon-chevron-down) center / 14px 14px no-repeat;
+  mask: var(--flux-icon-chevron-down) center / 14px 14px no-repeat;
+  transition: transform 160ms ease;
+  width: 14px;
 }
 
 #mainmenu details[open] > summary::after {
-  content: "⌃";
+  transform: rotate(180deg);
 }
 
 #mainmenu .active > a,
@@ -972,13 +990,20 @@ th,
 }
 
 .flux-menu-directory summary::after {
+  background: currentColor;
   color: var(--flux-muted);
-  content: "⌄";
+  content: "";
   float: right;
+  height: 18px;
+  margin-top: 1px;
+  -webkit-mask: var(--flux-icon-chevron-down) center / 18px 18px no-repeat;
+  mask: var(--flux-icon-chevron-down) center / 18px 18px no-repeat;
+  transition: transform 160ms ease;
+  width: 18px;
 }
 
-.flux-menu-directory details[open] summary::after {
-  content: "⌃";
+.flux-menu-directory details[open] > summary::after {
+  transform: rotate(180deg);
 }
 
 .flux-menu-directory-children,

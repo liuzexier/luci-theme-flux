@@ -52,7 +52,7 @@ local theme_primary = valid_hex(uci:get("flux", "theme", "primary_color"), "#0f7
 local theme_bg_light = valid_hex(uci:get("flux", "theme", "background_light"), "#f7f8fb")
 local theme_bg_dark = valid_hex(uci:get("flux", "theme", "background_dark"), "#101418")
 local theme_glass = clamp_number(uci:get("flux", "theme", "glass_opacity"), 0.72, 0.35, 0.95)
-local asset_version = "0.1.0-r14"
+local asset_version = "0.1.0-r15"
 local function split_path(path)
   local parts = {}
 
