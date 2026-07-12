@@ -86,7 +86,7 @@ local function sorted_children(node)
   end
 
   for name, child in pairs(node.children) do
-    if child and child.title and depends_satisfied(child) then
+    if child and child.title and child.satisfied ~= false and depends_satisfied(child) then
       children[#children + 1] = { name = name, node = child }
     end
   end
@@ -105,6 +105,10 @@ local function sorted_children(node)
   return children
 end
 
+local function is_page_alias(node)
+  return node and type(node.action) == "table" and node.action.type == "alias"
+end
+
 local function render_directory(node, prefix, depth)
   local children = sorted_children(node)
 
@@ -114,7 +118,7 @@ local function render_directory(node, prefix, depth)
     local grandchildren = sorted_children(item)
     local title = pcdata(translate(item.title))
 
-    if #grandchildren > 0 then
+    if #grandchildren > 0 and not is_page_alias(item) then
       write('<details class="flux-menu-directory-branch flux-depth-' .. tostring(depth or 0) .. '">')
       write('<summary>' .. title .. '</summary>')
       write('<div class="flux-menu-directory-children">')

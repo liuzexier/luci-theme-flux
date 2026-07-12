@@ -51,8 +51,8 @@ end
 local theme_primary = valid_hex(uci:get("flux", "theme", "primary_color"), "#0f766e")
 local theme_bg_light = valid_hex(uci:get("flux", "theme", "background_light"), "#f7f8fb")
 local theme_bg_dark = valid_hex(uci:get("flux", "theme", "background_dark"), "#101418")
-local theme_glass = clamp_number(uci:get("flux", "theme", "glass_opacity"), 0.72, 0.35, 0.95)
-local asset_version = "0.1.0-r15"
+local theme_glass = clamp_number(uci:get("flux", "theme", "glass_opacity"), 0.95, 0.35, 0.95)
+local asset_version = "0.1.0-r16"
 local function split_path(path)
   local parts = {}
 
@@ -151,7 +151,7 @@ local function sorted_children(node)
   end
 
   for name, child in pairs(node.children) do
-    if child and child.title and depends_satisfied(child) then
+    if child and child.title and child.satisfied ~= false and depends_satisfied(child) then
       children[#children + 1] = { name = name, node = child }
     end
   end
@@ -171,6 +171,9 @@ local function sorted_children(node)
 end
 local function has_children(node)
   return #sorted_children(node) > 0
+end
+local function is_page_alias(node)
+  return node and type(node.action) == "table" and node.action.type == "alias"
 end
 local function slot_config(slot)
   local fallback = flux_defaults[slot] or flux_defaults.slot1
@@ -195,7 +198,7 @@ local function render_menu_tree(node, prefix, depth)
   for _, child in ipairs(children) do
     local item = child.node
     local child_path = prefix and (prefix .. "/" .. child.name) or child.name
-    local branch = has_children(item)
+    local branch = has_children(item) and not is_page_alias(item)
 
     if branch then
       write('<li class="flux-bottom-branch"><details>')
@@ -235,7 +238,7 @@ local function render_sidebar_tree(node, prefix, depth)
   for _, child in ipairs(children) do
     local item = child.node
     local child_path = prefix and (prefix .. "/" .. child.name) or child.name
-    local branch = has_children(item)
+    local branch = has_children(item) and not is_page_alias(item)
     local active = path_is_active(child_path)
     local title = pcdata(translate(item.title))
 

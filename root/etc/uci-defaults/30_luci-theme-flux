@@ -1,8 +1,28 @@
 #!/bin/sh
 
+theme_mode="$(uci -q get flux.theme.mode)"
+theme_primary_color="$(uci -q get flux.theme.primary_color)"
+theme_background_light="$(uci -q get flux.theme.background_light)"
+theme_background_dark="$(uci -q get flux.theme.background_dark)"
+theme_glass_opacity="$(uci -q get flux.theme.glass_opacity)"
+
+[ -n "$theme_mode" ] || theme_mode="auto"
+[ -n "$theme_primary_color" ] || theme_primary_color="#0f766e"
+[ -n "$theme_background_light" ] || theme_background_light="#f7f8fb"
+[ -n "$theme_background_dark" ] || theme_background_dark="#101418"
+if [ -z "$theme_glass_opacity" ] || [ "$theme_glass_opacity" = "0.72" ]; then
+	theme_glass_opacity="0.95"
+fi
+
 uci -q batch <<-EOF >/dev/null
 	set luci.themes.Flux=/luci-static/flux
 	commit luci
+	set flux.theme=appearance
+	set flux.theme.mode="$theme_mode"
+	set flux.theme.primary_color="$theme_primary_color"
+	set flux.theme.background_light="$theme_background_light"
+	set flux.theme.background_dark="$theme_background_dark"
+	set flux.theme.glass_opacity="$theme_glass_opacity"
 	set flux.slot1=menu
 	set flux.slot1.enabled=1
 	set flux.slot1.label=Home

@@ -3,7 +3,7 @@ config appearance 'theme'
 	option primary_color '#0f766e'
 	option background_light '#f7f8fb'
 	option background_dark '#101418'
-	option glass_opacity '0.72'
+	option glass_opacity '0.95'
 
 config menu 'slot1'
 	option enabled '1'

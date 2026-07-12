@@ -35,7 +35,7 @@ glass:value("0.82", translate("轻微透明"))
 glass:value("0.72", translate("均衡"))
 glass:value("0.58", translate("清透"))
 glass:value("0.42", translate("高透明"))
-glass.default = "0.72"
+glass.default = "0.95"
 glass.rmempty = false
 
 return m
