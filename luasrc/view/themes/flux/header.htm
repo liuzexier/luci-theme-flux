@@ -52,7 +52,7 @@ local theme_primary = valid_hex(uci:get("flux", "theme", "primary_color"), "#0f7
 local theme_bg_light = valid_hex(uci:get("flux", "theme", "background_light"), "#f7f8fb")
 local theme_bg_dark = valid_hex(uci:get("flux", "theme", "background_dark"), "#101418")
 local theme_glass = clamp_number(uci:get("flux", "theme", "glass_opacity"), 0.95, 0.35, 0.95)
-local asset_version = "0.1.0-r16"
+local asset_version = "0.1.0-r17"
 local function split_path(path)
   local parts = {}
 
@@ -198,7 +198,7 @@ local function render_menu_tree(node, prefix, depth)
   for _, child in ipairs(children) do
     local item = child.node
     local child_path = prefix and (prefix .. "/" .. child.name) or child.name
-    local branch = has_children(item) and not is_page_alias(item)
+    local branch = (depth or 0) == 0 and has_children(item) and not is_page_alias(item)
 
     if branch then
       write('<li class="flux-bottom-branch"><details>')
@@ -238,7 +238,7 @@ local function render_sidebar_tree(node, prefix, depth)
   for _, child in ipairs(children) do
     local item = child.node
     local child_path = prefix and (prefix .. "/" .. child.name) or child.name
-    local branch = has_children(item) and not is_page_alias(item)
+    local branch = (depth or 0) == 0 and has_children(item) and not is_page_alias(item)
     local active = path_is_active(child_path)
     local title = pcdata(translate(item.title))
 
@@ -351,3 +351,6 @@ local flux_slot3 = slot_config("slot3")
           <noscript>
             <div class="alert-message warning"><%:JavaScript is required for LuCI to work properly.%></div>
           </noscript>
+          <% if logged_in then -%>
+          <div id="tabmenu" class="flux-page-tabs" style="display:none"></div>
+          <% end -%>

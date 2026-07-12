@@ -192,13 +192,13 @@ html[data-flux-theme="dark"] #app .page-container .model_btn {
 }
 
 .flux-layout {
-  display: grid;
-  grid-template-columns: 280px minmax(0, 1fr);
+  display: block;
   min-height: calc(100vh - var(--flux-header-height));
+  padding-left: 280px;
 }
 
 body:not(.logged-in) .flux-layout {
-  grid-template-columns: minmax(0, 1fr);
+  padding-left: 0;
 }
 
 .flux-sidebar {
@@ -208,10 +208,16 @@ body:not(.logged-in) .flux-layout {
     linear-gradient(180deg, rgba(var(--flux-accent-rgb), 0.08), transparent 34%),
     var(--flux-glass-bg);
   border-right: 1px solid var(--flux-glass-border);
+  bottom: 0;
+  left: 0;
   min-width: 0;
   overflow-y: auto;
   padding: 14px 12px 22px;
+  position: fixed;
   scrollbar-width: thin;
+  top: var(--flux-header-height);
+  width: 280px;
+  z-index: 40;
 }
 
 .flux-content {
@@ -899,6 +905,38 @@ th,
   padding: 0;
 }
 
+.flux-page-tabs:empty {
+  display: none !important;
+}
+
+.flux-page-tabs > .tabs {
+  background: var(--flux-surface);
+  border: 1px solid var(--flux-border);
+  border-radius: var(--flux-radius);
+  margin-bottom: 14px;
+  padding: 4px;
+}
+
+.flux-page-tabs > .tabs + .tabs {
+  margin-top: -10px;
+}
+
+.flux-page-tabs > .tabs li {
+  flex: 0 0 auto;
+}
+
+.flux-page-tabs > .tabs a {
+  border-radius: 6px;
+  min-height: 36px;
+  padding: 7px 12px;
+}
+
+.flux-page-tabs > .tabs .active a {
+  background: color-mix(in srgb, var(--flux-accent) 12%, var(--flux-surface));
+  color: var(--flux-accent-strong);
+  font-weight: 700;
+}
+
 [data-tab-active="false"] {
   display: none !important;
 }
@@ -1057,6 +1095,7 @@ th,
 
   .flux-layout {
     display: block;
+    padding-left: 0;
   }
 
   .flux-sidebar {

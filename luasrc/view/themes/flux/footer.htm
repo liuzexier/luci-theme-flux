@@ -2,5 +2,8 @@
       </main>
     </div>
   </div>
+  <% if luci.dispatcher.context.authsession then -%>
+  <script>L.require('menu-flux')</script>
+  <% end -%>
 </body>
 </html>
