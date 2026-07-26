@@ -4,15 +4,57 @@ theme_mode="$(uci -q get flux.theme.mode)"
 theme_primary_color="$(uci -q get flux.theme.primary_color)"
 theme_background_light="$(uci -q get flux.theme.background_light)"
 theme_background_dark="$(uci -q get flux.theme.background_dark)"
-theme_glass_opacity="$(uci -q get flux.theme.glass_opacity)"
+slot1_source="$(uci -q get flux.slot1.source)"
+slot1_menu_path="$(uci -q get flux.slot1.menu_path)"
+slot1_custom_path="$(uci -q get flux.slot1.custom_path)"
+slot1_legacy_path="$(uci -q get flux.slot1.path)"
+slot1_label="$(uci -q get flux.slot1.label)"
+slot1_icon="$(uci -q get flux.slot1.icon)"
+slot2_source="$(uci -q get flux.slot2.source)"
+slot2_menu_path="$(uci -q get flux.slot2.menu_path)"
+slot2_custom_path="$(uci -q get flux.slot2.custom_path)"
+slot2_legacy_path="$(uci -q get flux.slot2.path)"
+slot2_label="$(uci -q get flux.slot2.label)"
+slot2_icon="$(uci -q get flux.slot2.icon)"
+slot3_source="$(uci -q get flux.slot3.source)"
+slot3_menu_path="$(uci -q get flux.slot3.menu_path)"
+slot3_custom_path="$(uci -q get flux.slot3.custom_path)"
+slot3_legacy_path="$(uci -q get flux.slot3.path)"
+slot3_label="$(uci -q get flux.slot3.label)"
+slot3_icon="$(uci -q get flux.slot3.icon)"
 
 [ -n "$theme_mode" ] || theme_mode="auto"
 [ -n "$theme_primary_color" ] || theme_primary_color="#0f766e"
 [ -n "$theme_background_light" ] || theme_background_light="#f7f8fb"
 [ -n "$theme_background_dark" ] || theme_background_dark="#101418"
-if [ -z "$theme_glass_opacity" ] || [ "$theme_glass_opacity" = "0.72" ]; then
-	theme_glass_opacity="0.95"
+case "$slot1_source" in
+	menu|custom) ;;
+	*) slot1_source="custom" ;;
+esac
+case "$slot1_legacy_path" in
+	admin|admin/*) slot1_menu_path="${slot1_menu_path:-$slot1_legacy_path}" ;;
+esac
+[ -n "$slot1_menu_path" ] || slot1_menu_path="admin/quickstart"
+if [ -z "$slot1_custom_path" ] && [ "$slot1_source" = "custom" ]; then
+	slot1_custom_path="${slot1_legacy_path:-/}"
 fi
+[ -n "$slot1_custom_path" ] || slot1_custom_path="/"
+[ -n "$slot1_label" ] || slot1_label="Home"
+[ -n "$slot1_icon" ] || slot1_icon="home"
+[ "$slot2_source" = "custom" ] || slot2_source="menu"
+[ -n "$slot2_menu_path" ] || slot2_menu_path="${slot2_legacy_path:-admin/services}"
+if [ -z "$slot2_custom_path" ] && [ "$slot2_source" = "custom" ]; then
+	slot2_custom_path="${slot2_legacy_path:-/}"
+fi
+[ -n "$slot2_label" ] || slot2_label="服务"
+[ -n "$slot2_icon" ] || slot2_icon="services"
+[ "$slot3_source" = "custom" ] || slot3_source="menu"
+[ -n "$slot3_menu_path" ] || slot3_menu_path="${slot3_legacy_path:-admin/network}"
+if [ -z "$slot3_custom_path" ] && [ "$slot3_source" = "custom" ]; then
+	slot3_custom_path="${slot3_legacy_path:-/}"
+fi
+[ -n "$slot3_label" ] || slot3_label="网络"
+[ -n "$slot3_icon" ] || slot3_icon="network"
 
 uci -q batch <<-EOF >/dev/null
 	set luci.themes.Flux=/luci-static/flux
@@ -22,25 +64,34 @@ uci -q batch <<-EOF >/dev/null
 	set flux.theme.primary_color="$theme_primary_color"
 	set flux.theme.background_light="$theme_background_light"
 	set flux.theme.background_dark="$theme_background_dark"
-	set flux.theme.glass_opacity="$theme_glass_opacity"
+	delete flux.theme.glass_opacity
 	set flux.slot1=menu
 	set flux.slot1.enabled=1
-	set flux.slot1.label=Home
-	set flux.slot1.icon=home
-	set flux.slot1.path=/
-	set flux.slot1.dropdown=0
+	set flux.slot1.source="$slot1_source"
+	set flux.slot1.menu_path="$slot1_menu_path"
+	set flux.slot1.custom_path="$slot1_custom_path"
+	set flux.slot1.label="$slot1_label"
+	set flux.slot1.icon="$slot1_icon"
+	delete flux.slot1.path
+	delete flux.slot1.dropdown
 	set flux.slot2=menu
 	set flux.slot2.enabled=1
-	set flux.slot2.label=服务
-	set flux.slot2.icon=services
-	set flux.slot2.path=admin/services
-	set flux.slot2.dropdown=1
+	set flux.slot2.source="$slot2_source"
+	set flux.slot2.menu_path="$slot2_menu_path"
+	set flux.slot2.custom_path="$slot2_custom_path"
+	set flux.slot2.label="$slot2_label"
+	set flux.slot2.icon="$slot2_icon"
+	delete flux.slot2.path
+	delete flux.slot2.dropdown
 	set flux.slot3=menu
 	set flux.slot3.enabled=1
-	set flux.slot3.label=网络
-	set flux.slot3.icon=network
-	set flux.slot3.path=admin/network
-	set flux.slot3.dropdown=1
+	set flux.slot3.source="$slot3_source"
+	set flux.slot3.menu_path="$slot3_menu_path"
+	set flux.slot3.custom_path="$slot3_custom_path"
+	set flux.slot3.label="$slot3_label"
+	set flux.slot3.icon="$slot3_icon"
+	delete flux.slot3.path
+	delete flux.slot3.dropdown
 	commit flux
 EOF
 

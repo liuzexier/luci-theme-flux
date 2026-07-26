@@ -11,9 +11,22 @@ local logged_in = dispatcher.context.authsession ~= nil
 local menu_root = dispatcher.menu_json() or {}
 local admin_tree = menu_root.children and menu_root.children.admin or menu_root
 local flux_defaults = {
-  slot1 = { label = "Home", icon = "home", path = "/", dropdown = "0" },
-  slot2 = { label = "Services", icon = "services", path = "admin/services", dropdown = "1" },
-  slot3 = { label = "Network", icon = "network", path = "admin/network", dropdown = "1" }
+  slot1 = { label = "Home", icon = "home", source = "custom", custom_path = "/" },
+  slot2 = { label = "Services", icon = "services", source = "menu", menu_path = "admin/services" },
+  slot3 = { label = "Network", icon = "network", source = "menu", menu_path = "admin/network" }
+}
+local valid_icons = {
+  home = true,
+  services = true,
+  network = true,
+  status = true,
+  system = true,
+  wifi = true,
+  vpn = true,
+  terminal = true,
+  storage = true,
+  settings = true,
+  all = true
 }
 local function valid_hex(value, fallback)
   value = tostring(value or "")
@@ -31,19 +44,6 @@ local function hex_rgb(value)
     tostring(tonumber(value:sub(3, 4), 16) or 0) .. ", " ..
     tostring(tonumber(value:sub(5, 6), 16) or 0)
 end
-local function clamp_number(value, fallback, min, max)
-  local number = tonumber(value) or fallback
-
-  if number < min then
-    return min
-  end
-
-  if number > max then
-    return max
-  end
-
-  return number
-end
 local theme_mode = uci:get("flux", "theme", "mode") or "auto"
 if theme_mode ~= "light" and theme_mode ~= "dark" then
   theme_mode = "auto"
@@ -51,8 +51,8 @@ end
 local theme_primary = valid_hex(uci:get("flux", "theme", "primary_color"), "#0f766e")
 local theme_bg_light = valid_hex(uci:get("flux", "theme", "background_light"), "#f7f8fb")
 local theme_bg_dark = valid_hex(uci:get("flux", "theme", "background_dark"), "#101418")
-local theme_glass = clamp_number(uci:get("flux", "theme", "glass_opacity"), 0.95, 0.35, 0.95)
-local asset_version = "0.1.0-r17"
+local theme_glass = 0.95
+local asset_version = "0.1.0-r18"
 local function split_path(path)
   local parts = {}
 
@@ -175,15 +175,70 @@ end
 local function is_page_alias(node)
   return node and type(node.action) == "table" and node.action.type == "alias"
 end
+local function valid_menu_path(path, fallback)
+  path = tostring(path or "")
+
+  if path == "admin" or path:match("^admin/[%w%._~%-%/]+$") then
+    return path
+  end
+
+  return fallback
+end
+local function valid_custom_path(path, fallback)
+  path = tostring(path or "")
+
+  if path:sub(1, 2) == "//" or path:match("^%a[%w+.-]*:") then
+    return fallback
+  end
+
+  if path:sub(1, 1) == "/" or path == "admin" or path:match("^admin/[%w%._~%-%/]+$") then
+    return path
+  end
+
+  return fallback
+end
+local function normalized_active_path(path)
+  local base = dispatcher.build_url()
+
+  if path == base then
+    return ""
+  end
+
+  if path:sub(1, #base + 1) == base .. "/" then
+    return path:sub(#base + 2)
+  end
+
+  return path
+end
 local function slot_config(slot)
   local fallback = flux_defaults[slot] or flux_defaults.slot1
+  local source = uci:get("flux", slot, "source") or fallback.source
+  local legacy_path = uci:get("flux", slot, "path")
+  local menu_fallback = fallback.menu_path or "admin"
+  local custom_fallback = fallback.custom_path or legacy_path or menu_fallback
+  local menu_path = valid_menu_path(uci:get("flux", slot, "menu_path") or legacy_path, menu_fallback)
+  local custom_path = valid_custom_path(uci:get("flux", slot, "custom_path") or legacy_path, custom_fallback)
+  local icon = uci:get("flux", slot, "icon") or fallback.icon
+  local label = uci:get("flux", slot, "label") or fallback.label
+
+  if source ~= "custom" then
+    source = "menu"
+  end
+
+  if not valid_icons[icon] then
+    icon = fallback.icon
+  end
+
+  if label == "" then
+    label = fallback.label
+  end
 
   return {
     enabled = uci:get("flux", slot, "enabled") or "1",
-    label = uci:get("flux", slot, "label") or fallback.label,
-    icon = uci:get("flux", slot, "icon") or fallback.icon,
-    path = uci:get("flux", slot, "path") or fallback.path,
-    dropdown = uci:get("flux", slot, "dropdown") or fallback.dropdown
+    label = label,
+    icon = icon,
+    source = source,
+    path = source == "custom" and custom_path or menu_path
   }
 end
 local function render_menu_tree(node, prefix, depth)
@@ -224,7 +279,7 @@ local function bottom_is_active(path)
     return current_path == "" or current_path == nil
   end
 
-  return path_is_active(path)
+  return path_is_active(normalized_active_path(path))
 end
 local function render_sidebar_tree(node, prefix, depth)
   local children = sorted_children(node)
@@ -261,8 +316,8 @@ local function render_bottom_slot(slot, config)
     return
   end
 
-  local menu_node = pathnode(config.path)
-  local has_dropdown = config.dropdown == "1" and #sorted_children(menu_node) > 0
+  local menu_node = config.source == "menu" and pathnode(config.path) or nil
+  local has_dropdown = menu_node and #sorted_children(menu_node) > 0 and not is_page_alias(menu_node)
   local active = bottom_is_active(config.path)
 
   write('<div class="flux-bottom-item' .. (has_dropdown and ' has-menu' or '') .. (active and ' is-active' or '') .. '" data-flux-bottom-item>')
@@ -312,8 +367,9 @@ local flux_slot3 = slot_config("slot3")
   <script src="<%=resource%>/xhr.js?v=<%=asset_version%>"></script>
   <script src="<%=resource%>/cbi.js?v=<%=asset_version%>"></script>
   <script src="<%=media%>/mobile.js?v=<%=asset_version%>" defer></script>
+  <script src="<%=media%>/settings.js?v=<%=asset_version%>" defer></script>
 </head>
-<body class="lang_<%=luci.i18n.context.lang%><%=logged_in and " logged-in" or ""%>">
+<body class="lang_<%=luci.i18n.context.lang%><%=logged_in and " logged-in" or ""%>" theme="<%=pcdata(theme_mode)%>">
   <div class="flux-shell">
     <header class="flux-header">
       <a class="flux-brand" href="<%=dispatcher.build_url()%>">
