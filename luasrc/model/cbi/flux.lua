@@ -181,6 +181,23 @@ bg_dark.placeholder = "#101418"
 bg_dark.datatype = "string"
 bg_dark.rmempty = false
 
+local tab_count = appearance:option(ListValue, "tab_count", translate("快捷入口数量"))
+for count = 1, 5 do
+  tab_count:value(tostring(count), tostring(count))
+end
+tab_count.default = "4"
+tab_count.rmempty = false
+
+function tab_count.cfgvalue(self, section)
+  local value = tonumber(self.map.uci:get("flux", section, self.option))
+
+  if not value or value < 1 or value > 5 then
+    return "4"
+  end
+
+  return tostring(math.floor(value))
+end
+
 local quick_tabs = m:section(SimpleSection)
 quick_tabs.template = "flux/quick_tabs"
 quick_tabs.branch_paths = branch_paths
@@ -327,6 +344,22 @@ add_slot("slot3", translate("Tab3"), {
   icon = "network",
   source = "menu",
   menu_path = "admin/network",
+  custom_path = "/"
+})
+
+add_slot("slot4", translate("Tab4"), {
+  label = translate("系统"),
+  icon = "system",
+  source = "menu",
+  menu_path = "admin/system",
+  custom_path = "/"
+})
+
+add_slot("slot5", translate("Tab5"), {
+  label = translate("状态"),
+  icon = "status",
+  source = "menu",
+  menu_path = "admin/status",
   custom_path = "/"
 })
 

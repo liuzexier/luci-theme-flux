@@ -8,18 +8,61 @@
   <link rel="stylesheet" href="../htdocs/luci-static/flux/cascade.css">
   <script src="../htdocs/luci-static/flux/mobile.js" defer></script>
 </head>
-<body>
+<body class="logged-in">
   <div class="flux-shell">
     <header class="flux-header">
       <a class="flux-brand" href="#">
         <img src="../htdocs/luci-static/flux/logo.svg" alt="">
         <span>OpenWrt Flux</span>
       </a>
+      <button class="flux-menu-button" type="button" aria-label="打开全部菜单" aria-controls="flux-mobile-drawer" aria-expanded="false" data-flux-drawer-toggle>
+        <span aria-hidden="true"></span>
+      </button>
     </header>
 
-    <div class="flux-backdrop" data-flux-backdrop></div>
+    <div class="flux-backdrop" data-flux-backdrop aria-hidden="true"></div>
 
-    <nav class="flux-bottom-nav" aria-label="快捷导航">
+    <aside class="flux-mobile-drawer" id="flux-mobile-drawer" role="dialog" aria-modal="true" aria-hidden="true" aria-label="全部菜单" data-flux-drawer>
+      <div class="flux-drawer-header">
+        <h2>全部菜单</h2>
+        <button class="flux-drawer-close" type="button" aria-label="关闭全部菜单" data-flux-drawer-close><span aria-hidden="true"></span></button>
+      </div>
+      <nav class="flux-drawer-menu" aria-label="主导航">
+        <ul class="flux-drawer-list flux-depth-0">
+          <li class="flux-drawer-leaf active"><a href="#overview">首页</a></li>
+          <li class="flux-drawer-branch"><details open><summary>状态</summary>
+            <ul class="flux-drawer-list flux-depth-1">
+              <li class="flux-drawer-leaf"><a href="#overview">概览</a></li>
+              <li class="flux-drawer-leaf"><a href="#routes">路由表</a></li>
+              <li class="flux-drawer-leaf"><a href="#logs">系统日志</a></li>
+            </ul>
+          </details></li>
+          <li class="flux-drawer-branch"><details><summary>系统</summary>
+            <ul class="flux-drawer-list flux-depth-1">
+              <li class="flux-drawer-leaf"><a href="#admin">管理权</a></li>
+              <li class="flux-drawer-leaf"><a href="flux-settings.html">Flux 主题设置</a></li>
+              <li class="flux-drawer-leaf"><a href="#software">软件包</a></li>
+            </ul>
+          </details></li>
+          <li class="flux-drawer-branch"><details><summary>服务</summary>
+            <ul class="flux-drawer-list flux-depth-1">
+              <li class="flux-drawer-leaf"><a href="#openclash">OpenClash</a></li>
+              <li class="flux-drawer-leaf"><a href="#ddns">动态 DNS</a></li>
+              <li class="flux-drawer-leaf"><a href="#terminal">终端</a></li>
+            </ul>
+          </details></li>
+          <li class="flux-drawer-branch"><details><summary>网络</summary>
+            <ul class="flux-drawer-list flux-depth-1">
+              <li class="flux-drawer-leaf"><a href="#interfaces">接口</a></li>
+              <li class="flux-drawer-leaf"><a href="#firewall">防火墙</a></li>
+            </ul>
+          </details></li>
+          <li class="flux-drawer-leaf"><a href="#logout">退出</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <nav class="flux-bottom-nav" aria-label="快捷导航" style="--flux-tab-count:4">
       <div class="flux-bottom-item">
         <a class="flux-bottom-link" href="#" data-flux-bottom-link data-icon="home">
           <span class="flux-bottom-icon"></span><span class="flux-bottom-label">Home</span>
@@ -60,10 +103,18 @@
         </div>
       </div>
 
-      <div class="flux-bottom-item" data-flux-bottom-item>
-        <a class="flux-bottom-link" href="flux-settings.html" data-flux-bottom-link data-icon="all">
-          <span class="flux-bottom-icon"></span><span class="flux-bottom-label">全部</span>
+      <div class="flux-bottom-item has-menu" data-flux-bottom-item>
+        <a class="flux-bottom-link" href="#system" data-flux-bottom-link data-icon="system">
+          <span class="flux-bottom-icon"></span><span class="flux-bottom-label">系统</span>
         </a>
+        <div class="flux-bottom-panel" data-flux-bottom-panel>
+          <ul class="flux-bottom-list flux-depth-0">
+            <li><a href="#system">系统</a></li>
+            <li><a href="#admin">管理权</a></li>
+            <li><a href="flux-settings.html">Flux 主题设置</a></li>
+            <li><a href="#software">软件包</a></li>
+          </ul>
+        </div>
       </div>
     </nav>
 

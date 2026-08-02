@@ -1,47 +1,47 @@
+<%
+local previews = {
+  { label = "Home", icon = "home" },
+  { label = translate("服务"), icon = "services" },
+  { label = translate("网络"), icon = "network" },
+  { label = translate("系统"), icon = "system" },
+  { label = translate("状态"), icon = "status" }
+}
+-%>
 <div class="cbi-section flux-quick-settings" data-flux-quick-settings>
-  <h3><%:底部快捷入口%></h3>
+  <div class="flux-quick-heading">
+    <h3><%:底部快捷入口%></h3>
+    <div class="flux-quick-actions">
+      <span class="flux-quick-count" data-flux-quick-count>4 / 5</span>
+      <button type="button" class="flux-quick-action flux-quick-add" title="<%:新增 Tab%>" aria-label="<%:新增 Tab%>" data-flux-add-slot>
+        <span aria-hidden="true"></span>
+      </button>
+      <button type="button" class="flux-quick-action flux-quick-delete" title="<%:删除当前 Tab%>" aria-label="<%:删除当前 Tab%>" data-flux-delete-slot>
+        <span aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
 
   <div class="flux-quick-slot-switch" role="tablist" aria-label="<%:快捷入口位置%>">
-    <button type="button" class="is-active" role="tab" aria-selected="true" data-flux-slot-button="slot1">
-      Tab1
+    <% for index = 1, 5 do -%>
+    <button type="button"<%=index == 1 and " class=\"is-active\"" or ""%> role="tab" aria-selected="<%=index == 1 and "true" or "false"%>" data-flux-slot-button="slot<%=index%>">
+      Tab<%=index%>
     </button>
-    <button type="button" role="tab" aria-selected="false" data-flux-slot-button="slot2">
-      Tab2
-    </button>
-    <button type="button" role="tab" aria-selected="false" data-flux-slot-button="slot3">
-      Tab3
-    </button>
+    <% end -%>
   </div>
 
   <div class="flux-quick-panels" data-flux-quick-panels></div>
 
   <div class="flux-quick-preview">
     <div class="flux-quick-preview-title"><%:预览%></div>
-    <div class="flux-quick-preview-nav">
-      <div class="flux-bottom-item" data-flux-preview-slot="slot1">
-        <div class="flux-bottom-link" data-icon="home">
+    <div class="flux-quick-preview-nav" data-flux-quick-preview-nav>
+      <% for index, preview in ipairs(previews) do -%>
+      <div class="flux-bottom-item" data-flux-preview-slot="slot<%=index%>">
+        <div class="flux-bottom-link" data-icon="<%=pcdata(preview.icon)%>">
           <span class="flux-bottom-icon"></span>
-          <span class="flux-bottom-label">Home</span>
+          <span class="flux-bottom-label"><%=pcdata(preview.label)%></span>
         </div>
       </div>
-      <div class="flux-bottom-item" data-flux-preview-slot="slot2">
-        <div class="flux-bottom-link" data-icon="services">
-          <span class="flux-bottom-icon"></span>
-          <span class="flux-bottom-label"><%:服务%></span>
-        </div>
-      </div>
-      <div class="flux-bottom-item" data-flux-preview-slot="slot3">
-        <div class="flux-bottom-link" data-icon="network">
-          <span class="flux-bottom-icon"></span>
-          <span class="flux-bottom-label"><%:网络%></span>
-        </div>
-      </div>
-      <div class="flux-bottom-item">
-        <div class="flux-bottom-link" data-icon="all">
-          <span class="flux-bottom-icon"></span>
-          <span class="flux-bottom-label"><%:全部%></span>
-        </div>
-      </div>
+      <% end -%>
     </div>
   </div>
 

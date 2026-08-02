@@ -13,7 +13,9 @@ local admin_tree = menu_root.children and menu_root.children.admin or menu_root
 local flux_defaults = {
   slot1 = { label = "Home", icon = "home", source = "custom", custom_path = "/" },
   slot2 = { label = "Services", icon = "services", source = "menu", menu_path = "admin/services" },
-  slot3 = { label = "Network", icon = "network", source = "menu", menu_path = "admin/network" }
+  slot3 = { label = "Network", icon = "network", source = "menu", menu_path = "admin/network" },
+  slot4 = { label = "System", icon = "system", source = "menu", menu_path = "admin/system" },
+  slot5 = { label = "Status", icon = "status", source = "menu", menu_path = "admin/status" }
 }
 local valid_icons = {
   home = true,
@@ -51,8 +53,10 @@ end
 local theme_primary = valid_hex(uci:get("flux", "theme", "primary_color"), "#0f766e")
 local theme_bg_light = valid_hex(uci:get("flux", "theme", "background_light"), "#f7f8fb")
 local theme_bg_dark = valid_hex(uci:get("flux", "theme", "background_dark"), "#101418")
+local tab_count = tonumber(uci:get("flux", "theme", "tab_count")) or 4
+tab_count = math.max(1, math.min(5, math.floor(tab_count)))
 local theme_glass = 0.95
-local asset_version = "0.1.0-r18"
+local asset_version = "0.1.0-r19"
 local function split_path(path)
   local parts = {}
 
@@ -234,7 +238,6 @@ local function slot_config(slot)
   end
 
   return {
-    enabled = uci:get("flux", slot, "enabled") or "1",
     label = label,
     icon = icon,
     source = source,
@@ -311,11 +314,37 @@ local function render_sidebar_tree(node, prefix, depth)
 
   write('</ul>')
 end
-local function render_bottom_slot(slot, config)
-  if config.enabled == "0" then
+local function render_drawer_tree(node, prefix, depth)
+  local children = sorted_children(node)
+
+  if #children == 0 then
     return
   end
 
+  write('<ul class="flux-drawer-list flux-depth-' .. tostring(depth or 0) .. '">')
+
+  for _, child in ipairs(children) do
+    local item = child.node
+    local child_path = prefix and (prefix .. "/" .. child.name) or child.name
+    local branch = has_children(item) and not is_page_alias(item)
+    local active = path_is_active(child_path)
+    local title = pcdata(translate(item.title))
+
+    if branch then
+      write('<li class="flux-drawer-branch' .. (active and ' active' or '') .. '"><details' .. (active and ' open' or '') .. '>')
+      write('<summary>' .. title .. '</summary>')
+      render_drawer_tree(item, child_path, (depth or 0) + 1)
+      write('</details></li>')
+    else
+      write('<li class="flux-drawer-leaf' .. (active and ' active' or '') .. '">')
+      write('<a href="' .. pcdata(pathurl(child_path)) .. '">' .. title .. '</a>')
+      write('</li>')
+    end
+  end
+
+  write('</ul>')
+end
+local function render_bottom_slot(slot, config)
   local menu_node = config.source == "menu" and pathnode(config.path) or nil
   local has_dropdown = menu_node and #sorted_children(menu_node) > 0 and not is_page_alias(menu_node)
   local active = bottom_is_active(config.path)
@@ -333,9 +362,11 @@ local function render_bottom_slot(slot, config)
 
   write('</div>')
 end
-local flux_slot1 = slot_config("slot1")
-local flux_slot2 = slot_config("slot2")
-local flux_slot3 = slot_config("slot3")
+local flux_slots = {}
+for index = 1, tab_count do
+  local slot = "slot" .. tostring(index)
+  flux_slots[index] = { name = slot, config = slot_config(slot) }
+end
 -%>
 <!DOCTYPE html>
 <html lang="<%=luci.i18n.context.lang%>" data-flux-theme="<%=pcdata(theme_mode)%>">
@@ -376,20 +407,30 @@ local flux_slot3 = slot_config("slot3")
         <img src="<%=media%>/logo.svg" alt="">
         <span><%=striptags(hostname)%></span>
       </a>
+      <% if logged_in then -%>
+      <button class="flux-menu-button" type="button" aria-label="<%:打开全部菜单%>" aria-controls="flux-mobile-drawer" aria-expanded="false" data-flux-drawer-toggle>
+        <span aria-hidden="true"></span>
+      </button>
+      <% end -%>
     </header>
 
     <% if logged_in then -%>
-    <div class="flux-backdrop" data-flux-backdrop></div>
+    <div class="flux-backdrop" data-flux-backdrop aria-hidden="true"></div>
 
-    <nav class="flux-bottom-nav" aria-label="<%:Quick navigation%>">
-      <% render_bottom_slot("slot1", flux_slot1) %>
-      <% render_bottom_slot("slot2", flux_slot2) %>
-      <% render_bottom_slot("slot3", flux_slot3) %>
-      <div class="flux-bottom-item<%=current_path == "admin/system/flux-menu" and " is-active" or ""%>" data-flux-bottom-item>
-        <a class="flux-bottom-link" href="<%=dispatcher.build_url("admin", "system", "flux-menu")%>" data-flux-bottom-link data-icon="all">
-          <span class="flux-bottom-icon"></span><span class="flux-bottom-label"><%:全部%></span>
-        </a>
+    <aside class="flux-mobile-drawer" id="flux-mobile-drawer" role="dialog" aria-modal="true" aria-hidden="true" aria-label="<%:全部菜单%>" data-flux-drawer>
+      <div class="flux-drawer-header">
+        <h2><%:全部菜单%></h2>
+        <button class="flux-drawer-close" type="button" aria-label="<%:关闭全部菜单%>" data-flux-drawer-close>
+          <span aria-hidden="true"></span>
+        </button>
       </div>
+      <nav class="flux-drawer-menu" aria-label="<%:Main navigation%>">
+        <% render_drawer_tree(admin_tree, "admin", 0) %>
+      </nav>
+    </aside>
+
+    <nav class="flux-bottom-nav" aria-label="<%:Quick navigation%>" style="--flux-tab-count:<%=tab_count%>">
+      <% for _, slot in ipairs(flux_slots) do render_bottom_slot(slot.name, slot.config) end %>
     </nav>
     <% end -%>
 

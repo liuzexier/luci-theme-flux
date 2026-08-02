@@ -1,124 +1,144 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-flux-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="format-detection" content="telephone=no">
-  <title>全部</title>
+  <title>Flux 主题设置</title>
   <link rel="stylesheet" href="../htdocs/luci-static/flux/cascade.css">
   <script src="../htdocs/luci-static/flux/mobile.js" defer></script>
+  <script src="../htdocs/luci-static/flux/settings.js" defer></script>
 </head>
-<body>
+<body class="logged-in">
   <div class="flux-shell">
     <header class="flux-header">
       <a class="flux-brand" href="index.html">
         <img src="../htdocs/luci-static/flux/logo.svg" alt="">
         <span>OpenWrt Flux</span>
       </a>
+      <button class="flux-menu-button" type="button" aria-label="打开全部菜单" aria-controls="flux-mobile-drawer" aria-expanded="false" data-flux-drawer-toggle>
+        <span aria-hidden="true"></span>
+      </button>
     </header>
 
-    <nav class="flux-bottom-nav" aria-label="快捷导航">
-      <div class="flux-bottom-item">
-        <a class="flux-bottom-link" href="index.html" data-flux-bottom-link data-icon="home">
-          <span class="flux-bottom-icon"></span><span class="flux-bottom-label">Home</span>
-        </a>
-      </div>
+    <div class="flux-backdrop" data-flux-backdrop aria-hidden="true"></div>
 
-      <div class="flux-bottom-item has-menu" data-flux-bottom-item>
-        <a class="flux-bottom-link" href="#services" data-flux-bottom-link data-icon="services">
-          <span class="flux-bottom-icon"></span><span class="flux-bottom-label">服务</span>
-        </a>
-        <div class="flux-bottom-panel" data-flux-bottom-panel>
-          <ul class="flux-bottom-list flux-depth-0">
-            <li><a href="#adblock">应用过滤</a></li>
-            <li><a href="#alist">易有云文件管理器移动端超长名称示例</a></li>
-            <li><a href="#openclash">OpenClash</a></li>
-            <li><a href="#ddns">动态 DNS</a></li>
-            <li><a href="#terminal">终端</a></li>
-          </ul>
-        </div>
+    <aside class="flux-mobile-drawer" id="flux-mobile-drawer" role="dialog" aria-modal="true" aria-hidden="true" aria-label="全部菜单" data-flux-drawer>
+      <div class="flux-drawer-header">
+        <h2>全部菜单</h2>
+        <button class="flux-drawer-close" type="button" aria-label="关闭全部菜单" data-flux-drawer-close><span aria-hidden="true"></span></button>
       </div>
+      <nav class="flux-drawer-menu" aria-label="主导航">
+        <ul class="flux-drawer-list flux-depth-0">
+          <li class="flux-drawer-leaf"><a href="index.html">首页</a></li>
+          <li class="flux-drawer-branch"><details><summary>状态</summary><ul class="flux-drawer-list flux-depth-1">
+            <li class="flux-drawer-leaf"><a href="#overview">概览</a></li>
+            <li class="flux-drawer-leaf"><a href="#logs">系统日志</a></li>
+          </ul></details></li>
+          <li class="flux-drawer-branch active"><details open><summary>系统</summary><ul class="flux-drawer-list flux-depth-1">
+            <li class="flux-drawer-leaf"><a href="#admin">管理权</a></li>
+            <li class="flux-drawer-leaf active"><a href="flux-settings.html">Flux 主题设置</a></li>
+            <li class="flux-drawer-leaf"><a href="#software">软件包</a></li>
+          </ul></details></li>
+          <li class="flux-drawer-branch"><details><summary>服务</summary><ul class="flux-drawer-list flux-depth-1">
+            <li class="flux-drawer-leaf"><a href="#openclash">OpenClash</a></li>
+            <li class="flux-drawer-leaf"><a href="#terminal">终端</a></li>
+          </ul></details></li>
+          <li class="flux-drawer-branch"><details><summary>网络</summary><ul class="flux-drawer-list flux-depth-1">
+            <li class="flux-drawer-leaf"><a href="#interfaces">接口</a></li>
+            <li class="flux-drawer-leaf"><a href="#firewall">防火墙</a></li>
+          </ul></details></li>
+          <li class="flux-drawer-leaf"><a href="#logout">退出</a></li>
+        </ul>
+      </nav>
+    </aside>
 
-      <div class="flux-bottom-item has-menu" data-flux-bottom-item>
-        <a class="flux-bottom-link" href="#network" data-flux-bottom-link data-icon="network">
-          <span class="flux-bottom-icon"></span><span class="flux-bottom-label">网络</span>
-        </a>
-        <div class="flux-bottom-panel" data-flux-bottom-panel>
-          <ul class="flux-bottom-list flux-depth-0">
-            <li><a href="#interfaces">接口</a></li>
-            <li><a href="#routes">路由</a></li>
-            <li><a href="#dhcp">DHCP/DNS</a></li>
-            <li><a href="#firewall">防火墙</a></li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="flux-bottom-item">
-        <a class="flux-bottom-link" href="flux-settings.html" data-flux-bottom-link data-icon="all">
-          <span class="flux-bottom-icon"></span><span class="flux-bottom-label">全部</span>
-        </a>
-      </div>
+    <nav class="flux-bottom-nav" aria-label="快捷导航" style="--flux-tab-count:4">
+      <div class="flux-bottom-item is-active"><a class="flux-bottom-link" href="index.html" data-flux-bottom-link data-icon="home"><span class="flux-bottom-icon"></span><span class="flux-bottom-label">Home</span></a></div>
+      <div class="flux-bottom-item has-menu" data-flux-bottom-item><a class="flux-bottom-link" href="#services" data-flux-bottom-link data-icon="services"><span class="flux-bottom-icon"></span><span class="flux-bottom-label">服务</span></a><div class="flux-bottom-panel" data-flux-bottom-panel><ul class="flux-bottom-list"><li><a href="#openclash">OpenClash</a></li><li><a href="#terminal">终端</a></li></ul></div></div>
+      <div class="flux-bottom-item has-menu" data-flux-bottom-item><a class="flux-bottom-link" href="#network" data-flux-bottom-link data-icon="network"><span class="flux-bottom-icon"></span><span class="flux-bottom-label">网络</span></a><div class="flux-bottom-panel" data-flux-bottom-panel><ul class="flux-bottom-list"><li><a href="#interfaces">接口</a></li><li><a href="#firewall">防火墙</a></li></ul></div></div>
+      <div class="flux-bottom-item has-menu" data-flux-bottom-item><a class="flux-bottom-link" href="#system" data-flux-bottom-link data-icon="system"><span class="flux-bottom-icon"></span><span class="flux-bottom-label">系统</span></a><div class="flux-bottom-panel" data-flux-bottom-panel><ul class="flux-bottom-list"><li><a href="#admin">管理权</a></li><li><a href="flux-settings.html">Flux 主题设置</a></li></ul></div></div>
     </nav>
 
     <div class="flux-layout">
-      <aside class="flux-sidebar">
-        <nav id="mainmenu" aria-label="主导航">
-          <ul>
-            <li><a href="index.html">状态</a></li>
-            <li class="active"><a href="flux-settings.html">系统</a></li>
-            <li><a href="#">服务</a></li>
-            <li><a href="#">网络</a></li>
-          </ul>
-        </nav>
-      </aside>
+      <aside class="flux-sidebar"><nav id="mainmenu" aria-label="主导航"><ul><li><a href="index.html">首页</a></li><li class="active"><a href="flux-settings.html">系统</a></li><li><a href="#services">服务</a></li><li><a href="#network">网络</a></li></ul></nav></aside>
 
       <main class="flux-content">
         <div class="flux-main">
-          <h1>全部</h1>
-          <section class="cbi-section">
-            <h2>全部菜单</h2>
-            <div class="flux-menu-directory">
-              <details open>
-                <summary>状态</summary>
-                <ul>
-                  <li><a href="#overview">概览</a></li>
-                  <li><a href="#routes">路由表</a></li>
-                  <li><a href="#logs">系统日志</a></li>
-                  <li><a href="#realtime">实时信息</a></li>
-                </ul>
-              </details>
-              <details>
-                <summary>系统</summary>
-                <ul>
-                  <li><a href="#admin">管理权</a></li>
-                  <li><a href="#software">软件包</a></li>
-                  <li><a href="#startup">启动项</a></li>
-                  <li><a href="flux-settings.html">Flux 主题设置</a></li>
-                </ul>
-              </details>
-              <details>
-                <summary>服务</summary>
-                <ul>
-                  <li><a href="#adblock">应用过滤</a></li>
-                  <li><a href="#openclash">OpenClash</a></li>
-                  <li><a href="#ddns">动态 DNS</a></li>
-                  <li><a href="#terminal">终端</a></li>
-                </ul>
-              </details>
-              <details>
-                <summary>网络</summary>
-                <ul>
-                  <li><a href="#interfaces">接口</a></li>
-                  <li><a href="#routes">路由</a></li>
-                  <li><a href="#dhcp">DHCP/DNS</a></li>
-                  <li><a href="#firewall">防火墙</a></li>
-                </ul>
-              </details>
+          <form>
+            <div id="cbi-flux">
+              <h1>Flux 主题设置</h1>
+              <p>配置 Flux 主题的外观和底部快捷入口。</p>
+
+              <section class="cbi-section" id="cbi-flux-theme">
+                <h2>外观</h2>
+                <div class="cbi-value"><label class="cbi-value-title">颜色模式</label><div class="cbi-value-field"><select name="cbid.flux.theme.mode"><option value="auto">跟随系统</option><option value="light">亮色</option><option value="dark">暗色</option></select></div></div>
+                <div class="cbi-value"><label class="cbi-value-title">主色调</label><div class="cbi-value-field"><input type="text" name="cbid.flux.theme.primary_color" value="#0f766e"></div></div>
+                <div class="cbi-value"><label class="cbi-value-title">亮色背景</label><div class="cbi-value-field"><input type="text" name="cbid.flux.theme.background_light" value="#f7f8fb"></div></div>
+                <div class="cbi-value"><label class="cbi-value-title">暗色背景</label><div class="cbi-value-field"><input type="text" name="cbid.flux.theme.background_dark" value="#101418"></div></div>
+                <div class="cbi-value"><label class="cbi-value-title">快捷入口数量</label><div class="cbi-value-field"><select name="cbid.flux.theme.tab_count"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option></select></div></div>
+              </section>
+
+              <section class="cbi-section flux-quick-settings" data-flux-quick-settings>
+                <div class="flux-quick-heading"><h3>底部快捷入口</h3><div class="flux-quick-actions"><span class="flux-quick-count" data-flux-quick-count>4 / 5</span><button type="button" class="flux-quick-action flux-quick-add" title="新增 Tab" aria-label="新增 Tab" data-flux-add-slot><span aria-hidden="true"></span></button><button type="button" class="flux-quick-action flux-quick-delete" title="删除当前 Tab" aria-label="删除当前 Tab" data-flux-delete-slot><span aria-hidden="true"></span></button></div></div>
+                <div class="flux-quick-slot-switch" role="tablist" aria-label="快捷入口位置">
+                  <button type="button" class="is-active" role="tab" aria-selected="true" data-flux-slot-button="slot1">Tab1</button>
+                  <button type="button" role="tab" aria-selected="false" data-flux-slot-button="slot2">Tab2</button>
+                  <button type="button" role="tab" aria-selected="false" data-flux-slot-button="slot3">Tab3</button>
+                  <button type="button" role="tab" aria-selected="false" data-flux-slot-button="slot4">Tab4</button>
+                  <button type="button" role="tab" aria-selected="false" data-flux-slot-button="slot5">Tab5</button>
+                </div>
+                <div class="flux-quick-panels" data-flux-quick-panels></div>
+                <div class="flux-quick-preview"><div class="flux-quick-preview-title">预览</div><div class="flux-quick-preview-nav" data-flux-quick-preview-nav>
+                  <div class="flux-bottom-item" data-flux-preview-slot="slot1"><div class="flux-bottom-link" data-icon="home"><span class="flux-bottom-icon"></span><span class="flux-bottom-label">Home</span></div></div>
+                  <div class="flux-bottom-item" data-flux-preview-slot="slot2"><div class="flux-bottom-link" data-icon="services"><span class="flux-bottom-icon"></span><span class="flux-bottom-label">服务</span></div></div>
+                  <div class="flux-bottom-item" data-flux-preview-slot="slot3"><div class="flux-bottom-link" data-icon="network"><span class="flux-bottom-icon"></span><span class="flux-bottom-label">网络</span></div></div>
+                  <div class="flux-bottom-item" data-flux-preview-slot="slot4"><div class="flux-bottom-link" data-icon="system"><span class="flux-bottom-icon"></span><span class="flux-bottom-label">系统</span></div></div>
+                  <div class="flux-bottom-item" data-flux-preview-slot="slot5"><div class="flux-bottom-link" data-icon="status"><span class="flux-bottom-icon"></span><span class="flux-bottom-label">状态</span></div></div>
+                </div></div>
+                <div hidden data-flux-branch-paths><span data-flux-branch-path="admin/status"></span><span data-flux-branch-path="admin/system"></span><span data-flux-branch-path="admin/services"></span><span data-flux-branch-path="admin/network"></span></div>
+              </section>
+
+              <div data-preview-slots></div>
             </div>
-          </section>
+            <div class="cbi-page-actions"><button type="reset" class="cbi-button">复位</button><button type="button" class="cbi-button cbi-button-positive">保存并应用</button></div>
+          </form>
         </div>
       </main>
     </div>
   </div>
+
+  <script>
+    (function () {
+      var defaults = [
+        ["custom", "admin/quickstart", "/", "Home", "home"],
+        ["menu", "admin/services", "/", "服务", "services"],
+        ["menu", "admin/network", "/", "网络", "network"],
+        ["menu", "admin/system", "/", "系统", "system"],
+        ["menu", "admin/status", "/", "状态", "status"]
+      ];
+      var icons = [["home", "Home"], ["services", "服务"], ["network", "网络"], ["status", "状态"], ["system", "系统"], ["wifi", "Wi-Fi"], ["vpn", "VPN"], ["terminal", "终端"], ["storage", "存储"], ["settings", "设置"], ["all", "全部"]];
+      var menus = [["admin/quickstart", "首页"], ["admin/status", "状态"], ["admin/status/overview", "状态 / 概览"], ["admin/system", "系统"], ["admin/system/flux", "系统 / Flux 主题设置"], ["admin/services", "服务"], ["admin/services/openclash", "服务 / OpenClash"], ["admin/network", "网络"], ["admin/network/interfaces", "网络 / 接口"]];
+      var host = document.querySelector("[data-preview-slots]");
+
+      function options(items, selected) {
+        return items.map(function (item) { return '<option value="' + item[0] + '"' + (item[0] === selected ? ' selected' : '') + '>' + item[1] + '</option>'; }).join("");
+      }
+
+      defaults.forEach(function (value, index) {
+        var slot = "slot" + (index + 1);
+        var section = document.createElement("section");
+        section.className = "cbi-section";
+        section.id = "cbi-flux-" + slot;
+        section.innerHTML = '<h3>Tab' + (index + 1) + '</h3>' +
+          '<div class="cbi-value"><label class="cbi-value-title">入口类型</label><div class="cbi-value-field"><select name="cbid.flux.' + slot + '.source"><option value="menu"' + (value[0] === "menu" ? " selected" : "") + '>菜单</option><option value="custom"' + (value[0] === "custom" ? " selected" : "") + '>自定义路径</option></select></div></div>' +
+          '<div class="cbi-value"><label class="cbi-value-title">菜单目标</label><div class="cbi-value-field"><select name="cbid.flux.' + slot + '.menu_path">' + options(menus, value[1]) + '</select></div></div>' +
+          '<div class="cbi-value"><label class="cbi-value-title">页面路径</label><div class="cbi-value-field"><input type="text" name="cbid.flux.' + slot + '.custom_path" value="' + value[2] + '"></div></div>' +
+          '<div class="cbi-value"><label class="cbi-value-title">显示名称</label><div class="cbi-value-field"><input type="text" name="cbid.flux.' + slot + '.label" value="' + value[3] + '"></div></div>' +
+          '<div class="cbi-value"><label class="cbi-value-title">图标</label><div class="cbi-value-field"><select name="cbid.flux.' + slot + '.icon">' + options(icons, value[4]) + '</select></div></div>';
+        host.parentNode.insertBefore(section, host);
+      });
+    })();
+  </script>
 </body>
 </html>

@@ -1,19 +1,28 @@
 (function () {
   "use strict";
 
-  var slots = ["slot1", "slot2", "slot3"];
+  var slots = ["slot1", "slot2", "slot3", "slot4", "slot5"];
+  var slotOptions = ["source", "menu_path", "custom_path", "label", "icon"];
   var slotDefaults = {
-    slot1: { label: "Home", icon: "home" },
-    slot2: { label: "服务", icon: "services" },
-    slot3: { label: "网络", icon: "network" }
+    slot1: { source: "custom", menu_path: "admin/quickstart", custom_path: "/", label: "Home", icon: "home" },
+    slot2: { source: "menu", menu_path: "admin/services", custom_path: "/", label: "服务", icon: "services" },
+    slot3: { source: "menu", menu_path: "admin/network", custom_path: "/", label: "网络", icon: "network" },
+    slot4: { source: "menu", menu_path: "admin/system", custom_path: "/", label: "系统", icon: "system" },
+    slot5: { source: "menu", menu_path: "admin/status", custom_path: "/", label: "状态", icon: "status" }
   };
 
-  function field(slot, option) {
-    return document.querySelector('[name="cbid.flux.' + slot + "." + option + '"]');
+  function field(section, option) {
+    return document.querySelector('[name="cbid.flux.' + section + "." + option + '"]');
   }
 
   function emitChange(element, type) {
-    var event = document.createEvent("HTMLEvents");
+    var event;
+
+    if (!element) {
+      return;
+    }
+
+    event = document.createEvent("HTMLEvents");
     event.initEvent(type || "change", true, false);
     element.dispatchEvent(event);
   }
@@ -83,7 +92,7 @@
 
   function createIconPicker(select, onChange) {
     if (!select) {
-      return;
+      return function () {};
     }
 
     var picker = document.createElement("div");
@@ -134,21 +143,22 @@
       updateButtons();
       onChange();
     });
+
+    return updateButtons;
   }
 
   function initialize() {
     var root = document.querySelector("[data-flux-quick-settings]");
+    var countField = field("theme", "tab_count");
 
     if (!root || root.classList.contains("is-enhanced")) {
       return;
     }
 
-    var fieldsReady = slots.every(function (slot) {
-      return field(slot, "source") &&
-        field(slot, "menu_path") &&
-        field(slot, "custom_path") &&
-        field(slot, "label") &&
-        field(slot, "icon");
+    var fieldsReady = countField && slots.every(function (slot) {
+      return slotOptions.every(function (option) {
+        return !!field(slot, option);
+      });
     });
 
     if (!fieldsReady) {
@@ -157,7 +167,12 @@
     }
 
     var panels = root.querySelector("[data-flux-quick-panels]");
+    var previewNav = root.querySelector("[data-flux-quick-preview-nav]");
+    var countNode = root.querySelector("[data-flux-quick-count]");
+    var addButton = root.querySelector("[data-flux-add-slot]");
+    var deleteButton = root.querySelector("[data-flux-delete-slot]");
     var branchPaths = {};
+    var visualUpdaters = {};
     var currentSlot = "slot1";
 
     Array.prototype.forEach.call(root.querySelectorAll("[data-flux-branch-path]"), function (node) {
@@ -177,6 +192,20 @@
       panels.appendChild(section);
     });
 
+    function slotIndex(slot) {
+      return slots.indexOf(slot);
+    }
+
+    function getCount() {
+      var count = Number(countField.value || 4);
+
+      if (!isFinite(count) || count < 1 || count > 5) {
+        count = 4;
+      }
+
+      return Math.floor(count);
+    }
+
     function updatePreview(slot) {
       var preview = root.querySelector('[data-flux-preview-slot="' + slot + '"]');
       var source = field(slot, "source");
@@ -185,16 +214,16 @@
       var icon = field(slot, "icon");
       var link = preview && preview.querySelector(".flux-bottom-link");
       var labelNode = preview && preview.querySelector(".flux-bottom-label");
-      var isBranch = source && source.value === "menu" && menuPath && branchPaths[menuPath.value];
+      var isBranch = source.value === "menu" && !!branchPaths[menuPath.value];
       var defaults = slotDefaults[slot];
 
       if (!preview || !link || !labelNode) {
         return;
       }
 
-      preview.classList.toggle("has-menu", !!isBranch);
-      link.setAttribute("data-icon", icon && icon.value ? icon.value : defaults.icon);
-      labelNode.textContent = label && label.value ? label.value : defaults.label;
+      preview.classList.toggle("has-menu", isBranch);
+      link.setAttribute("data-icon", icon.value || defaults.icon);
+      labelNode.textContent = label.value || defaults.label;
     }
 
     function updateTargetHint(slot) {
@@ -206,9 +235,9 @@
         return;
       }
 
-      if (source && source.value === "custom") {
+      if (source.value === "custom") {
         hint.textContent = "点击 Tab 时直接进入自定义路径";
-      } else if (menuPath && branchPaths[menuPath.value]) {
+      } else if (branchPaths[menuPath.value]) {
         hint.textContent = "包含子菜单，点击 Tab 时展开";
       } else {
         hint.textContent = "点击 Tab 时直接进入页面";
@@ -220,7 +249,7 @@
       var label = field(slot, "label");
       var title = selectedMenuTitle(menuPath);
 
-      if (label && title) {
+      if (title) {
         label.value = title;
         emitChange(label, "input");
         emitChange(label);
@@ -231,10 +260,10 @@
       var source = field(slot, "source");
       var menuRow = fieldRow(field(slot, "menu_path"));
       var customRow = fieldRow(field(slot, "custom_path"));
-      var custom = source && source.value === "custom";
+      var custom = source.value === "custom";
 
       if (menuRow) {
-        menuRow.hidden = !!custom;
+        menuRow.hidden = custom;
       }
 
       if (customRow) {
@@ -243,6 +272,13 @@
     }
 
     function activateSlot(slot) {
+      var count = getCount();
+      var index = slotIndex(slot);
+
+      if (index < 0 || index >= count) {
+        slot = slots[Math.max(0, count - 1)];
+      }
+
       currentSlot = slot;
 
       Array.prototype.forEach.call(root.querySelectorAll("[data-flux-slot-button]"), function (button) {
@@ -262,6 +298,69 @@
       });
     }
 
+    function updateVisibleSlots() {
+      var count = getCount();
+
+      slots.forEach(function (slot, index) {
+        var visible = index < count;
+        var button = root.querySelector('[data-flux-slot-button="' + slot + '"]');
+        var preview = root.querySelector('[data-flux-preview-slot="' + slot + '"]');
+
+        if (button) {
+          button.hidden = !visible;
+        }
+
+        if (preview) {
+          preview.hidden = !visible;
+        }
+      });
+
+      if (previewNav) {
+        previewNav.style.setProperty("--flux-tab-count", String(count));
+      }
+
+      if (countNode) {
+        countNode.textContent = count + " / 5";
+      }
+
+      addButton.disabled = count >= 5;
+      deleteButton.disabled = count <= 1;
+      activateSlot(currentSlot);
+    }
+
+    function setCount(count) {
+      countField.value = String(Math.max(1, Math.min(5, count)));
+      emitChange(countField);
+      updateVisibleSlots();
+    }
+
+    function setSlotValues(slot, values) {
+      slotOptions.forEach(function (option) {
+        var element = field(slot, option);
+
+        element.value = values[option] == null ? "" : values[option];
+        emitChange(element, option === "label" || option === "custom_path" ? "input" : "change");
+      });
+
+      updateSourceFields(slot);
+      updateTargetHint(slot);
+      updatePreview(slot);
+    }
+
+    function readSlotValues(slot) {
+      var values = {};
+
+      slotOptions.forEach(function (option) {
+        values[option] = field(slot, option).value;
+      });
+
+      return values;
+    }
+
+    function resetSlot(slot) {
+      setSlotValues(slot, slotDefaults[slot]);
+    }
+
     Array.prototype.forEach.call(root.querySelectorAll("[data-flux-slot-button]"), function (button) {
       button.addEventListener("click", function () {
         activateSlot(button.getAttribute("data-flux-slot-button"));
@@ -279,11 +378,12 @@
       hint.className = "flux-quick-target-hint";
       hint.setAttribute("data-flux-target-hint", slot);
 
-      if (fieldContainer(menuPath)) {
-        fieldContainer(menuPath).appendChild(hint);
+      if (fieldContainer(source)) {
+        fieldContainer(source).appendChild(hint);
       }
 
-      createSegmentedSelect(source, "flux-entry-source", function () {
+      visualUpdaters[slot] = {};
+      visualUpdaters[slot].source = createSegmentedSelect(source, "flux-entry-source", function () {
         if (source.value === "menu") {
           setLabelFromMenu(slot);
         }
@@ -295,7 +395,7 @@
         }, 0);
       });
 
-      createIconPicker(icon, function () {
+      visualUpdaters[slot].icon = createIconPicker(icon, function () {
         updatePreview(slot);
       });
 
@@ -304,42 +404,81 @@
         updateTargetHint(slot);
         updatePreview(slot);
       });
-      if (customPath) {
-        customPath.addEventListener("input", function () {
-          updatePreview(slot);
-        });
-      }
-
-      if (label) {
-        label.addEventListener("input", function () {
-          updatePreview(slot);
-        });
-      }
+      customPath.addEventListener("input", function () {
+        updatePreview(slot);
+      });
+      label.addEventListener("input", function () {
+        updatePreview(slot);
+      });
 
       updateSourceFields(slot);
       updateTargetHint(slot);
       updatePreview(slot);
     });
 
-    var invalidPanel = root.querySelector("[data-flux-quick-panel] .cbi-input-invalid, [data-flux-quick-panel] .cbi-section-error");
+    addButton.addEventListener("click", function () {
+      var count = getCount();
+      var slot;
 
+      if (count >= 5) {
+        return;
+      }
+
+      slot = slots[count];
+      resetSlot(slot);
+      currentSlot = slot;
+      setCount(count + 1);
+    });
+
+    deleteButton.addEventListener("click", function () {
+      var count = getCount();
+      var index = slotIndex(currentSlot);
+      var nextIndex;
+
+      if (count <= 1 || index < 0 || index >= count) {
+        return;
+      }
+
+      for (nextIndex = index; nextIndex < count - 1; nextIndex += 1) {
+        setSlotValues(slots[nextIndex], readSlotValues(slots[nextIndex + 1]));
+      }
+
+      resetSlot(slots[count - 1]);
+      currentSlot = slots[Math.min(index, count - 2)];
+      setCount(count - 1);
+    });
+
+    countField.addEventListener("change", function () {
+      updateVisibleSlots();
+    });
+
+    var countRow = fieldRow(countField);
+    if (countRow) {
+      countRow.hidden = true;
+    }
+
+    var invalidPanel = root.querySelector("[data-flux-quick-panel] .cbi-input-invalid, [data-flux-quick-panel] .cbi-section-error");
     if (invalidPanel) {
       var invalidSection = invalidPanel.closest("[data-flux-quick-panel]");
       currentSlot = invalidSection ? invalidSection.getAttribute("data-flux-quick-panel") : currentSlot;
     }
 
     root.classList.add("is-enhanced");
-    activateSlot(currentSlot);
+    updateVisibleSlots();
 
     var form = root.closest("form");
-
     if (form) {
       form.addEventListener("reset", function () {
         window.setTimeout(function () {
           slots.forEach(function (slot) {
+            visualUpdaters[slot].source();
+            visualUpdaters[slot].icon();
+            updateSourceFields(slot);
             updateTargetHint(slot);
             updatePreview(slot);
           });
+          currentSlot = "slot1";
+          updateVisibleSlots();
         }, 0);
       });
     }
