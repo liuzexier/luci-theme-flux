@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-flux-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no">
+  <title>Flux iPad 下拉测试</title>
+  <link rel="stylesheet" href="../htdocs/luci-static/flux/cascade.css?v=ipad-dropdown-6">
+  <style>
+    .demo-shell {
+      margin: 0 auto;
+      max-width: 920px;
+      min-height: 100dvh;
+      padding: 28px 22px calc(44px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .demo-header {
+      align-items: center;
+      display: flex;
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .demo-header img {
+      height: 42px;
+      width: 42px;
+    }
+
+    .demo-header h1 {
+      font-size: 24px;
+      margin: 0;
+    }
+
+    .demo-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .demo-card {
+      overflow: visible;
+    }
+
+    .demo-card h2 {
+      font-size: 18px;
+      margin: 0 0 18px;
+    }
+
+    .demo-card .cbi-value:last-child {
+      margin-bottom: 0;
+    }
+
+    .demo-card .cbi-page-actions {
+      margin-top: 0;
+    }
+
+    .demo-nested-section {
+      margin: 0;
+    }
+
+    .demo-result {
+      color: var(--flux-muted);
+      font-size: 14px;
+      margin: 16px 0 0;
+      overflow-wrap: anywhere;
+    }
+
+    html[data-demo-touch] .cbi-dropdown[open] > ul.dropdown,
+    html[data-demo-touch] .cbi-page-actions .cbi-dropdown.important[open] > ul.dropdown {
+      bottom: auto;
+      box-sizing: border-box;
+      left: -1px !important;
+      max-width: calc(100% + 2px);
+      min-width: calc(100% + 2px);
+      right: auto !important;
+      width: calc(100% + 2px);
+    }
+
+    @media (max-width: 640px) {
+      .demo-shell {
+        padding: 18px 12px calc(32px + env(safe-area-inset-bottom, 0px));
+      }
+
+      .demo-header h1 {
+        font-size: 21px;
+      }
+    }
+  </style>
+</head>
+<body class="logged-in">
+  <main class="demo-shell">
+    <header class="demo-header">
+      <img src="../htdocs/luci-static/flux/logo.svg" alt="">
+      <h1>iPad Safari 下拉测试</h1>
+    </header>
+
+    <div class="demo-grid">
+      <section class="cbi-map demo-card">
+        <h2>网络唤醒</h2>
+        <p class="cbi-map-descr">验证嵌套表单里的接口和主机选择器。</p>
+        <div class="cbi-section demo-nested-section">
+          <div class="cbi-section-node">
+            <div class="cbi-value">
+              <label class="cbi-value-title" for="demo-interface">选择使用的网络接口</label>
+              <div class="cbi-value-field">
+                <div class="cbi-dropdown" id="demo-interface" tabindex="0" data-demo-dropdown data-demo-output="interface-result" data-demo-prefix="当前接口：">
+                  <ul tabindex="-1" data-demo-menu hidden>
+                    <li data-value="br-lan" selected>br-lan（网桥）</li>
+                    <li data-value="br-lan.1">br-lan.1（LAN）</li>
+                    <li data-value="br-lan.100">br-lan.100（Guest LAN）</li>
+                    <li data-value="docker0">docker0（Docker 网桥）</li>
+                    <li data-value="eth0">eth0（WAN / WAN6）</li>
+                    <li data-value="eth1">eth1（2.5G LAN）</li>
+                    <li data-value="eth2">eth2（LAN）</li>
+                    <li data-value="eth3">eth3（LAN）</li>
+                    <li data-value="hassio">hassio（Home Assistant）</li>
+                    <li data-value="tailscale0">tailscale0（Tailscale）</li>
+                  </ul>
+                  <ul class="preview" tabindex="-1">
+                    <li display="0" data-demo-preview>br-lan（网桥）</li>
+                  </ul>
+                  <span class="more" tabindex="-1">···</span>
+                  <span class="open" tabindex="-1">▾</span>
+                  <div tabindex="0"></div>
+                </div>
+                <div class="cbi-value-description">指定发送网络唤醒数据包的接口</div>
+              </div>
+            </div>
+
+            <div class="cbi-value">
+              <label class="cbi-value-title" for="demo-host">选择要唤醒的主机</label>
+              <div class="cbi-value-field">
+                <div class="cbi-dropdown" id="demo-host" tabindex="0" data-demo-dropdown data-demo-output="host-result" data-demo-prefix="当前主机：" empty>
+                  <ul tabindex="-1" data-demo-menu hidden>
+                    <li data-value="00:11:22:33:44:55">工作站（00:11:22:33:44:55）</li>
+                    <li data-value="02:22:33:44:55:66">家庭服务器（02:22:33:44:55:66）</li>
+                    <li data-value="04:33:44:55:66:77">客厅电脑（04:33:44:55:66:77）</li>
+                  </ul>
+                  <ul class="preview" tabindex="-1">
+                    <li display="0" data-demo-preview></li>
+                  </ul>
+                  <span class="more" tabindex="-1">···</span>
+                  <span class="open" tabindex="-1">▾</span>
+                  <div tabindex="0"></div>
+                </div>
+                <div class="cbi-value-description">选择要唤醒的主机，或者输入自定义 MAC 地址</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="demo-result" data-demo-result="interface-result">当前接口：br-lan（网桥）</p>
+        <p class="demo-result" data-demo-result="host-result">当前主机：尚未选择</p>
+      </section>
+
+      <section class="cbi-section demo-card">
+        <h2>页面操作</h2>
+        <div class="cbi-page-actions">
+          <div class="cbi-dropdown important cbi-button-apply" id="demo-apply" tabindex="0" data-demo-dropdown data-demo-action-dropdown data-demo-output="apply-result" data-demo-prefix="当前操作：">
+            <ul tabindex="-1" data-demo-menu hidden>
+              <li data-value="apply" selected>保存并应用</li>
+              <li data-value="force">强制应用</li>
+            </ul>
+            <ul class="preview" tabindex="-1">
+              <li display="0" data-demo-preview>保存并应用</li>
+            </ul>
+            <span class="more" tabindex="-1">···</span>
+            <span class="open" tabindex="-1">▾</span>
+            <div tabindex="0"></div>
+          </div>
+          <button type="button" class="cbi-button">保存</button>
+          <button type="button" class="cbi-button">复位</button>
+        </div>
+        <p class="demo-result" data-demo-result="apply-result">尚未执行操作</p>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var forcedTouch = new URLSearchParams(location.search).has("touch");
+      var touchLayout = forcedTouch || ("ontouchstart" in window) || matchMedia("(any-pointer: coarse)").matches;
+
+      if (forcedTouch) document.documentElement.setAttribute("data-demo-touch", "");
+
+      function closeDropdown(dropdown) {
+        if (!dropdown.hasAttribute("open")) return;
+        var list = dropdown.querySelector("[data-demo-menu]");
+        dropdown.removeAttribute("open");
+        dropdown.parentElement.classList.remove("cbi-dropdown-open");
+        list.classList.remove("dropdown");
+        list.hidden = true;
+        list.style.top = "";
+        list.style.bottom = "";
+        list.style.left = "";
+        list.style.right = "";
+        list.style.maxHeight = "";
+      }
+
+      function closeAll(except) {
+        document.querySelectorAll("[data-demo-dropdown][open]").forEach(function (dropdown) {
+          if (dropdown !== except) closeDropdown(dropdown);
+        });
+      }
+
+      function positionDropdown(dropdown) {
+        var list = dropdown.querySelector("[data-demo-menu]");
+        var rect = dropdown.getBoundingClientRect();
+        var viewportWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+        var viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+
+        if (touchLayout) {
+          list.style.top = dropdown.offsetHeight + "px";
+          list.style.left = -rect.left + "px";
+          list.style.right = rect.right - viewportWidth + "px";
+          list.style.maxHeight = viewportHeight * 0.5 + "px";
+        } else {
+          var spaceBelow = viewportHeight - rect.bottom;
+          var spaceAbove = rect.top;
+          if (spaceBelow >= spaceAbove) {
+            list.style.top = rect.height + "px";
+            list.style.maxHeight = Math.max(96, spaceBelow - 12) + "px";
+          } else {
+            list.style.bottom = rect.height + "px";
+            list.style.maxHeight = Math.max(96, spaceAbove - 12) + "px";
+          }
+        }
+      }
+
+      function openDropdown(dropdown) {
+        closeAll(dropdown);
+        var list = dropdown.querySelector("[data-demo-menu]");
+        dropdown.setAttribute("open", "");
+        dropdown.parentElement.classList.add("cbi-dropdown-open");
+        list.hidden = false;
+        list.classList.add("dropdown");
+        positionDropdown(dropdown);
+      }
+
+      document.querySelectorAll("[data-demo-dropdown]").forEach(function (dropdown) {
+        dropdown.addEventListener("click", function (event) {
+          var item = event.target.closest("li[data-value]");
+          if (item && dropdown.hasAttribute("open")) {
+            var list = dropdown.querySelector("[data-demo-menu]");
+            list.querySelectorAll("li[selected]").forEach(function (entry) {
+              entry.removeAttribute("selected");
+            });
+            item.setAttribute("selected", "");
+            dropdown.querySelector("[data-demo-preview]").textContent = item.textContent.trim();
+            var output = document.querySelector('[data-demo-result="' + dropdown.getAttribute("data-demo-output") + '"]');
+            output.textContent = dropdown.getAttribute("data-demo-prefix") + item.textContent.trim();
+            closeDropdown(dropdown);
+            event.stopPropagation();
+            return;
+          }
+
+          if (dropdown.hasAttribute("data-demo-action-dropdown")) {
+            if (event.target.closest(".open")) {
+              dropdown.hasAttribute("open") ? closeDropdown(dropdown) : openDropdown(dropdown);
+            } else {
+              document.querySelector('[data-demo-result="apply-result"]').textContent =
+                "已执行：" + dropdown.querySelector("[data-demo-preview]").textContent.trim();
+              closeDropdown(dropdown);
+            }
+            event.stopPropagation();
+            return;
+          }
+
+          dropdown.hasAttribute("open") ? closeDropdown(dropdown) : openDropdown(dropdown);
+          event.stopPropagation();
+        });
+
+        dropdown.addEventListener("keydown", function (event) {
+          if (event.key === "Escape") closeDropdown(dropdown);
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            dropdown.hasAttribute("open") ? closeDropdown(dropdown) : openDropdown(dropdown);
+          }
+        });
+      });
+
+      document.addEventListener("click", function () { closeAll(); });
+      window.addEventListener("resize", function () {
+        document.querySelectorAll("[data-demo-dropdown][open]").forEach(positionDropdown);
+      });
+    })();
+  </script>
+</body>
+</html>

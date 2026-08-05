@@ -827,7 +827,7 @@ h3 {
 .cbi-section {
   margin-bottom: 16px;
   max-width: 100%;
-  overflow-x: auto;
+  overflow: visible;
   padding: 16px;
 }
 
@@ -909,6 +909,10 @@ button,
   margin: 0;
   min-width: 0;
   padding: 0;
+}
+
+.cbi-dropdown > ul[hidden] {
+  display: none !important;
 }
 
 .cbi-dropdown > ul.preview {
@@ -1026,11 +1030,13 @@ button,
   padding: 0;
 }
 
-.cbi-page-actions .cbi-dropdown.important:not([open]) > ul {
+.cbi-page-actions .cbi-dropdown.important > ul.preview {
   background: transparent;
   border: 0;
   box-shadow: none;
-  display: block;
+  display: flex;
+  grid-column: 1;
+  grid-row: 1;
   min-width: 0;
   position: static;
   width: auto;
@@ -1050,8 +1056,25 @@ button,
 .cbi-page-actions .cbi-dropdown.important > .open {
   border-left: 1px solid rgba(255, 255, 255, 0.22);
   color: rgba(255, 255, 255, 0.86);
+  font-size: 0;
+  grid-column: 2;
+  grid-row: 1;
   min-width: 38px;
   padding: 0 10px;
+}
+
+.cbi-page-actions .cbi-dropdown.important > .open::after {
+  background: currentColor;
+  content: "";
+  height: 16px;
+  -webkit-mask: var(--flux-icon-chevron-down) center / 16px 16px no-repeat;
+  mask: var(--flux-icon-chevron-down) center / 16px 16px no-repeat;
+  transition: transform 160ms ease;
+  width: 16px;
+}
+
+.cbi-page-actions .cbi-dropdown.important[open] > .open::after {
+  transform: rotate(180deg);
 }
 
 .cbi-page-actions .cbi-dropdown.important[open] > ul.dropdown {
@@ -1201,6 +1224,15 @@ th,
   min-width: 0;
   max-width: 100%;
   overflow: visible;
+}
+
+.cbi-value-field.cbi-dropdown-open {
+  position: relative;
+  z-index: 130;
+}
+
+.cbi-value-field > .cbi-dropdown:not(.btn) {
+  min-width: min(280px, 100%);
 }
 
 .cbi-value-field > * {
@@ -1740,5 +1772,18 @@ th,
   .flux-bottom-list summary {
     font-size: 16px;
     min-height: 40px;
+  }
+}
+
+@media (any-pointer: coarse) {
+  .cbi-dropdown[open] > ul.dropdown,
+  .cbi-page-actions .cbi-dropdown.important[open] > ul.dropdown {
+    bottom: auto;
+    box-sizing: border-box;
+    left: -1px !important;
+    max-width: calc(100% + 2px);
+    min-width: calc(100% + 2px);
+    right: auto !important;
+    width: calc(100% + 2px);
   }
 }
