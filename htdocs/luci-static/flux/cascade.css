@@ -967,14 +967,17 @@ button,
   background: var(--flux-surface);
   border: 1px solid var(--flux-border);
   border-radius: var(--flux-radius);
-  bottom: calc(100% + 6px);
   box-shadow: var(--flux-shadow);
   display: block;
   left: 0;
   min-width: 100%;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   position: absolute;
+  touch-action: pan-y;
   width: max-content;
+  -webkit-overflow-scrolling: touch;
   z-index: 120;
 }
 
@@ -1197,8 +1200,7 @@ th,
 .cbi-value-field {
   min-width: 0;
   max-width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow: visible;
 }
 
 .cbi-value-field > * {
