@@ -5,8 +5,8 @@ LUCI_DEPENDS:=+luci-base
 LUCI_PKGARCH:=all
 
 PKG_NAME:=luci-theme-flux
-PKG_VERSION:=0.1.0
-PKG_RELEASE:=24
+PKG_VERSION:=0.1.0-rc1
+PKG_RELEASE:=1
 PKG_LICENSE:=MIT
 
 include ../../luci.mk

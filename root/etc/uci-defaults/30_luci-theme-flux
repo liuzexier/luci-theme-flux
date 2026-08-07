@@ -28,11 +28,13 @@ slot4_menu_path="$(uci -q get flux.slot4.menu_path)"
 slot4_custom_path="$(uci -q get flux.slot4.custom_path)"
 slot4_label="$(uci -q get flux.slot4.label)"
 slot4_icon="$(uci -q get flux.slot4.icon)"
+slot4_legacy_path="$(uci -q get flux.slot4.path)"
 slot5_source="$(uci -q get flux.slot5.source)"
 slot5_menu_path="$(uci -q get flux.slot5.menu_path)"
 slot5_custom_path="$(uci -q get flux.slot5.custom_path)"
 slot5_label="$(uci -q get flux.slot5.label)"
 slot5_icon="$(uci -q get flux.slot5.icon)"
+slot5_legacy_path="$(uci -q get flux.slot5.path)"
 
 [ -n "$theme_mode" ] || theme_mode="auto"
 [ -n "$theme_primary_color" ] || theme_primary_color="#0f766e"
@@ -61,6 +63,7 @@ fi
 if [ -z "$slot2_custom_path" ] && [ "$slot2_source" = "custom" ]; then
 	slot2_custom_path="${slot2_legacy_path:-/}"
 fi
+[ -n "$slot2_custom_path" ] || slot2_custom_path="/"
 [ -n "$slot2_label" ] || slot2_label="服务"
 [ -n "$slot2_icon" ] || slot2_icon="services"
 [ "$slot3_source" = "custom" ] || slot3_source="menu"
@@ -68,14 +71,23 @@ fi
 if [ -z "$slot3_custom_path" ] && [ "$slot3_source" = "custom" ]; then
 	slot3_custom_path="${slot3_legacy_path:-/}"
 fi
+[ -n "$slot3_custom_path" ] || slot3_custom_path="/"
 [ -n "$slot3_label" ] || slot3_label="网络"
 [ -n "$slot3_icon" ] || slot3_icon="network"
 [ "$slot4_source" = "custom" ] || slot4_source="menu"
-[ -n "$slot4_menu_path" ] || slot4_menu_path="admin/system"
+[ -n "$slot4_menu_path" ] || slot4_menu_path="${slot4_legacy_path:-admin/system}"
+if [ -z "$slot4_custom_path" ] && [ "$slot4_source" = "custom" ]; then
+	slot4_custom_path="${slot4_legacy_path:-/}"
+fi
+[ -n "$slot4_custom_path" ] || slot4_custom_path="/"
 [ -n "$slot4_label" ] || slot4_label="系统"
 [ -n "$slot4_icon" ] || slot4_icon="system"
 [ "$slot5_source" = "custom" ] || slot5_source="menu"
-[ -n "$slot5_menu_path" ] || slot5_menu_path="admin/status"
+[ -n "$slot5_menu_path" ] || slot5_menu_path="${slot5_legacy_path:-admin/status}"
+if [ -z "$slot5_custom_path" ] && [ "$slot5_source" = "custom" ]; then
+	slot5_custom_path="${slot5_legacy_path:-/}"
+fi
+[ -n "$slot5_custom_path" ] || slot5_custom_path="/"
 [ -n "$slot5_label" ] || slot5_label="状态"
 [ -n "$slot5_icon" ] || slot5_icon="status"
 

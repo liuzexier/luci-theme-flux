@@ -56,7 +56,8 @@ local theme_bg_dark = valid_hex(uci:get("flux", "theme", "background_dark"), "#1
 local tab_count = tonumber(uci:get("flux", "theme", "tab_count")) or 4
 tab_count = math.max(1, math.min(5, math.floor(tab_count)))
 local theme_glass = 0.95
-local asset_version = "0.1.0-r24"
+local asset_stat = fs.stat((dispatcher.context.docroot or "/www") .. media .. "/cascade.css")
+local asset_version = asset_stat and asset_stat.mtime and tostring(asset_stat.mtime) or tostring(ver.luciversion)
 local function split_path(path)
   local parts = {}
 
@@ -220,8 +221,19 @@ local function slot_config(slot)
   local legacy_path = uci:get("flux", slot, "path")
   local menu_fallback = fallback.menu_path or "admin"
   local custom_fallback = fallback.custom_path or legacy_path or menu_fallback
-  local menu_path = valid_menu_path(uci:get("flux", slot, "menu_path") or legacy_path, menu_fallback)
-  local custom_path = valid_custom_path(uci:get("flux", slot, "custom_path") or legacy_path, custom_fallback)
+  local menu_path_value = uci:get("flux", slot, "menu_path")
+  local custom_path_value = uci:get("flux", slot, "custom_path")
+
+  if menu_path_value == "" then
+    menu_path_value = nil
+  end
+
+  if custom_path_value == "" then
+    custom_path_value = nil
+  end
+
+  local menu_path = valid_menu_path(menu_path_value or legacy_path, menu_fallback)
+  local custom_path = valid_custom_path(custom_path_value or legacy_path, custom_fallback)
   local icon = uci:get("flux", slot, "icon") or fallback.icon
   local label = uci:get("flux", slot, "label") or fallback.label
 
@@ -408,6 +420,7 @@ end
         <span><%=striptags(hostname)%></span>
       </a>
       <% if logged_in then -%>
+      <div id="indicators" class="flux-indicators" aria-live="polite"></div>
       <button class="flux-menu-button" type="button" aria-label="<%:打开全部菜单%>" aria-controls="flux-mobile-drawer" aria-expanded="false" data-flux-drawer-toggle>
         <span aria-hidden="true"></span>
       </button>

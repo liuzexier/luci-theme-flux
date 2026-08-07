@@ -28,6 +28,107 @@
     details.open = !details.open;
   }
 
+  function showApplyStatus() {
+    if (window.L && L.require) {
+      L.require("ui").then(function (ui) {
+        ui.showIndicator("flux-apply", "正在等待配置被应用", null, "active");
+      });
+    }
+  }
+
+  function hideApplyStatus() {
+    if (window.L && L.require) {
+      L.require("ui").then(function (ui) {
+        ui.hideIndicator("flux-apply");
+      });
+    }
+  }
+
+  function splitApplyActions(root) {
+    root.querySelectorAll(".flux-main .cbi-page-actions .cbi-dropdown.important:not(.flux-apply-source)").forEach(function (dropdown) {
+      var options = dropdown.querySelectorAll("ul:not(.preview) > li[data-value]:not([placeholder])");
+      var pageActions = dropdown.closest(".cbi-page-actions");
+
+      if (options.length < 2) {
+        options = dropdown.querySelectorAll("ul:not(.preview) > li:not([placeholder])");
+      }
+      var actions;
+
+      if (options.length < 2) {
+        return;
+      }
+
+      if (pageActions) {
+        pageActions.querySelectorAll(".flux-apply-actions").forEach(function (actions) {
+          actions.remove();
+        });
+      }
+
+      actions = document.createElement("div");
+      actions.className = "flux-apply-actions";
+
+      Array.prototype.forEach.call(options, function (option, index) {
+        var button = document.createElement("button");
+
+        button.type = "button";
+        button.className = "cbi-button " + (index === 0 ? "cbi-button-apply" : "cbi-button-force");
+        button.textContent = option.textContent.trim();
+        button.addEventListener("click", function (event) {
+          event.preventDefault();
+          option.dispatchEvent(new CustomEvent("cbi-dropdown-select", { bubbles: true }));
+          dropdown.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+        });
+
+        actions.appendChild(button);
+      });
+
+      dropdown.classList.add("flux-apply-source");
+      dropdown.parentNode.insertBefore(actions, dropdown);
+    });
+  }
+
+  function splitChangeDialogActions(root) {
+    root.querySelectorAll(".uci-dialog .button-row > .cbi-dropdown:not(.flux-change-source)").forEach(function (dropdown) {
+      var row = dropdown.closest(".button-row");
+      var options = dropdown.querySelectorAll(":scope > ul > li[data-value]");
+      var actions;
+
+      if (!row || options.length < 2) {
+        return;
+      }
+
+      row.querySelectorAll(".flux-change-actions").forEach(function (oldActions) {
+        oldActions.remove();
+      });
+
+      actions = document.createElement("div");
+      actions.className = "flux-change-actions";
+
+      Array.prototype.forEach.call(options, function (option, index) {
+        var button = document.createElement("button");
+
+        button.type = "button";
+        button.className = "btn cbi-button " + (index === 0 ? "cbi-button-apply" : "cbi-button-force");
+        button.textContent = option.textContent.trim();
+        button.addEventListener("click", function (event) {
+          event.preventDefault();
+          showApplyStatus();
+
+          if (window.L && L.require) {
+            L.require("ui").then(function (ui) {
+              ui.changes.apply(index === 0);
+            });
+          }
+        });
+
+        actions.appendChild(button);
+      });
+
+      dropdown.classList.add("flux-change-source");
+      row.insertBefore(actions, dropdown);
+    });
+  }
+
   function toggleBottomMenu(link, event) {
     var item = link.closest("[data-flux-bottom-item].has-menu");
 
@@ -237,6 +338,25 @@
 
       trapDrawerFocus(event);
     });
+
+    document.addEventListener("click", function (event) {
+      if (event.target.closest(".cbi-page-actions .cbi-button-apply, .cbi-page-actions .cbi-button-force, .cbi-page-actions .cbi-button-save")) {
+        showApplyStatus();
+      }
+    });
+
+    document.addEventListener("uci-applied", hideApplyStatus);
+    document.addEventListener("uci-reverted", hideApplyStatus);
+
+    splitApplyActions(document);
+    splitChangeDialogActions(document);
+
+    if (window.MutationObserver) {
+      new MutationObserver(function () {
+        splitApplyActions(document);
+        splitChangeDialogActions(document);
+      }).observe(document.body, { childList: true, subtree: true });
+    }
 
     if (window.matchMedia) {
       desktopQuery = window.matchMedia("(min-width: 901px)");
