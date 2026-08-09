@@ -2107,3 +2107,33 @@ th,
     width: auto !important;
   }
 }
+
+@media (max-width: 640px) {
+  .cbi-page-actions .flux-apply-actions {
+    align-items: stretch;
+    flex-direction: column;
+    margin-left: 0;
+    max-width: none;
+    overflow: visible;
+    width: 100%;
+  }
+
+  .cbi-page-actions .flux-apply-actions .cbi-button {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100% !important;
+  }
+
+  .uci-dialog .button-row > .flux-change-actions {
+    align-items: stretch;
+    flex: 1 1 100%;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .uci-dialog .button-row > .flux-change-actions .cbi-button {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
+  }
+}
