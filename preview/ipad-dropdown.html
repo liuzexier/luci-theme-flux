@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="format-detection" content="telephone=no">
   <title>Flux iPad 下拉测试</title>
-  <link rel="stylesheet" href="../htdocs/luci-static/flux/cascade.css?v=ipad-dropdown-6">
+  <link rel="stylesheet" href="../htdocs/luci-static/flux/cascade.css?v=ipad-dropdown-7">
   <style>
     .demo-shell {
       margin: 0 auto;
@@ -112,7 +112,7 @@
       color: #ffffff;
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: 900px) {
       .demo-shell {
         padding: 18px 12px calc(32px + env(safe-area-inset-bottom, 0px));
       }
@@ -215,6 +215,18 @@
           <button type="button" class="cbi-button">复位</button>
         </div>
         <p class="demo-result" data-demo-result="apply-result">尚未执行操作</p>
+      </section>
+
+      <section class="cbi-section demo-card uci-dialog">
+        <h2>配置更改操作</h2>
+        <div class="button-row">
+          <button type="button" class="btn cbi-button">关闭</button>
+          <div class="flux-change-actions">
+            <button type="button" class="btn cbi-button cbi-button-apply">保存并应用</button>
+            <button type="button" class="btn cbi-button cbi-button-force">强制应用</button>
+          </div>
+          <button type="button" class="btn cbi-button">恢复</button>
+        </div>
       </section>
     </div>
   </main>

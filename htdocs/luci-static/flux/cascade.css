@@ -1889,6 +1889,15 @@ th,
     display: inline-flex;
   }
 
+  .flux-menu-button {
+    flex: 0 0 44px;
+    margin-left: auto;
+  }
+
+  .flux-indicators:not(:empty) + .flux-menu-button {
+    margin-left: 0;
+  }
+
   .flux-backdrop {
     inset: var(--flux-header-height) 0 0;
     z-index: 100;
@@ -1971,6 +1980,58 @@ th,
     padding-bottom: calc(130px + var(--flux-bottom-height));
   }
 
+  .cbi-page-actions {
+    align-items: stretch;
+    flex-direction: column;
+    margin-bottom: 18px;
+  }
+
+  .cbi-page-actions .cbi-button,
+  .cbi-page-actions .cbi-dropdown,
+  .cbi-page-actions button,
+  .cbi-page-actions .btn {
+    width: 100%;
+  }
+
+  .cbi-page-actions .cbi-dropdown > ul {
+    width: 100%;
+  }
+
+  .cbi-page-actions .flux-apply-actions {
+    align-items: stretch;
+    flex-direction: column;
+    margin-left: 0;
+    max-width: none;
+    overflow: visible;
+    width: 100%;
+  }
+
+  .cbi-page-actions .flux-apply-actions .cbi-button {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100% !important;
+  }
+
+  .uci-dialog .button-row > * {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .uci-dialog .button-row > .flux-change-actions {
+    align-items: stretch;
+    display: grid;
+    flex: 1 1 100%;
+    grid-template-columns: minmax(0, 1fr);
+    min-width: 0;
+    width: 100% !important;
+  }
+
+  .uci-dialog .button-row > .flux-change-actions .cbi-button {
+    flex: none;
+    min-width: 0;
+    width: 100% !important;
+  }
+
   .uci-change-legend {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1992,11 +2053,6 @@ th,
 
   .uci-change-legend {
     grid-template-columns: 1fr;
-  }
-
-  .uci-dialog .button-row > * {
-    flex: 1 1 100%;
-    width: 100%;
   }
 
   .cbi-map,
@@ -2038,23 +2094,6 @@ th,
   .th {
     min-width: 120px;
     padding: 9px;
-  }
-
-  .cbi-page-actions {
-    align-items: stretch;
-    flex-direction: column;
-    margin-bottom: 18px;
-  }
-
-  .cbi-page-actions .cbi-button,
-  .cbi-page-actions .cbi-dropdown,
-  .cbi-page-actions button,
-  .cbi-page-actions .btn {
-    width: 100%;
-  }
-
-  .cbi-page-actions .cbi-dropdown > ul {
-    width: 100%;
   }
 
   .flux-icon-picker {
@@ -2105,35 +2144,5 @@ th,
     flex: 0 0 auto;
     min-width: max-content;
     width: auto !important;
-  }
-}
-
-@media (max-width: 640px) {
-  .cbi-page-actions .flux-apply-actions {
-    align-items: stretch;
-    flex-direction: column;
-    margin-left: 0;
-    max-width: none;
-    overflow: visible;
-    width: 100%;
-  }
-
-  .cbi-page-actions .flux-apply-actions .cbi-button {
-    flex: 1 1 auto;
-    min-width: 0;
-    width: 100% !important;
-  }
-
-  .uci-dialog .button-row > .flux-change-actions {
-    align-items: stretch;
-    flex: 1 1 100%;
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .uci-dialog .button-row > .flux-change-actions .cbi-button {
-    flex: 1 1 auto;
-    min-width: 0;
-    width: 100%;
   }
 }
