@@ -1,6 +1,48 @@
 (function () {
   "use strict";
 
+  console.info("%c[Flux Local Dev]%c Assets are served by the local Vite proxy.", "font-weight:700", "font-weight:400");
+
+  function hexRgb(value) {
+    var hex = String(value || "").replace("#", "");
+    return [0, 2, 4].map(function (offset) {
+      return parseInt(hex.slice(offset, offset + 2), 16) || 0;
+    }).join(", ");
+  }
+
+  function loadThemeConstants() {
+    var script = document.currentScript;
+    var constantsUrl = script && script.src
+      ? script.src.replace(/mobile\.js/, "constants.json")
+      : "/luci-static/flux/constants.json";
+
+    fetch(constantsUrl, { cache: "no-store" })
+      .then(function (response) {
+        return response.ok ? response.json() : Promise.reject(new Error("Unable to load Flux constants"));
+      })
+      .then(function (constants) {
+        var appearance = constants.appearance || {};
+        var legacy = appearance.legacyPrimary || [];
+        var root = document.documentElement;
+        var current = getComputedStyle(root).getPropertyValue("--flux-accent").trim().toLowerCase();
+        var theme = root.getAttribute("data-flux-theme") || "auto";
+        var dark = theme === "dark" || (theme === "auto" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+        window.FluxThemeConstants = constants;
+
+        if (legacy.some(function (color) { return String(color).toLowerCase() === current; })) {
+          root.style.setProperty("--flux-accent", appearance.primary);
+          root.style.setProperty("--flux-accent-rgb", hexRgb(appearance.primary));
+          root.style.setProperty("--flux-accent-strong", "color-mix(in srgb, " + appearance.primary + (dark ? " 76%, white)" : " 82%, black)"));
+        }
+      })
+      .catch(function (error) {
+        console.warn("[Flux]", error.message);
+      });
+  }
+
+  loadThemeConstants();
+
   var drawer;
   var drawerToggle;
   var drawerClose;

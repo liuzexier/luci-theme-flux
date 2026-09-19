@@ -1,6 +1,7 @@
 <%
 local sys = require "luci.sys"
 local fs = require "nixio.fs"
+local jsonc = require "luci.jsonc"
 local uci = require "luci.model.uci".cursor()
 local dispatcher = require "luci.dispatcher"
 local ver = require "luci.version"
@@ -10,6 +11,11 @@ local current_path = request and table.concat(request, "/") or ""
 local logged_in = dispatcher.context.authsession ~= nil
 local menu_root = dispatcher.menu_json() or {}
 local admin_tree = menu_root.children and menu_root.children.admin or menu_root
+local constants_path = (dispatcher.context.docroot or "/www") .. media .. "/constants.json"
+local constants = jsonc.parse(fs.readfile(constants_path) or "") or {}
+local appearance_defaults = constants.appearance or {}
+local light_defaults = appearance_defaults.light or {}
+local dark_defaults = appearance_defaults.dark or {}
 local flux_defaults = {
   slot1 = { label = "Home", icon = "home", source = "custom", custom_path = "/" },
   slot2 = { label = "Services", icon = "services", source = "menu", menu_path = "admin/services" },
@@ -46,16 +52,29 @@ local function hex_rgb(value)
     tostring(tonumber(value:sub(3, 4), 16) or 0) .. ", " ..
     tostring(tonumber(value:sub(5, 6), 16) or 0)
 end
+local function is_legacy_primary(value)
+  value = tostring(value or ""):lower()
+
+  for _, legacy in ipairs(appearance_defaults.legacyPrimary or {}) do
+    if value == tostring(legacy):lower() then
+      return true
+    end
+  end
+
+  return false
+end
 local theme_mode = uci:get("flux", "theme", "mode") or "auto"
 if theme_mode ~= "light" and theme_mode ~= "dark" then
   theme_mode = "auto"
 end
-local theme_primary = valid_hex(uci:get("flux", "theme", "primary_color"), "#0f766e")
-local theme_bg_light = valid_hex(uci:get("flux", "theme", "background_light"), "#f7f8fb")
-local theme_bg_dark = valid_hex(uci:get("flux", "theme", "background_dark"), "#101418")
+local configured_primary = uci:get("flux", "theme", "primary_color")
+local default_primary = valid_hex(appearance_defaults.primary)
+local theme_primary = is_legacy_primary(configured_primary) and default_primary or valid_hex(configured_primary, default_primary)
+local theme_bg_light = valid_hex(uci:get("flux", "theme", "background_light"), valid_hex(light_defaults.background))
+local theme_bg_dark = valid_hex(uci:get("flux", "theme", "background_dark"), valid_hex(dark_defaults.background))
 local tab_count = tonumber(uci:get("flux", "theme", "tab_count")) or 4
 tab_count = math.max(1, math.min(5, math.floor(tab_count)))
-local theme_glass = 0.95
+local theme_glass = tonumber(appearance_defaults.glassOpacity) or 0.95
 local asset_stat = fs.stat((dispatcher.context.docroot or "/www") .. media .. "/cascade.css")
 local asset_version = asset_stat and asset_stat.mtime and tostring(asset_stat.mtime) or tostring(ver.luciversion)
 local function split_path(path)
@@ -397,11 +416,15 @@ end
       --flux-accent-strong: color-mix(in srgb, <%=theme_primary%> 82%, black);
       --flux-glass-opacity: <%=theme_glass%>;
     }
+    html[data-flux-theme="dark"] {
+      --flux-accent-strong: color-mix(in srgb, <%=theme_primary%> 76%, white);
+    }
     <% if theme_mode == "auto" then -%>
     @media (prefers-color-scheme: dark) {
       :root {
         --flux-bg: <%=theme_bg_dark%>;
         --flux-bg-rgb: <%=hex_rgb(theme_bg_dark)%>;
+        --flux-accent-strong: color-mix(in srgb, <%=theme_primary%> 76%, white);
       }
     }
     <% end -%>
@@ -416,7 +439,7 @@ end
   <div class="flux-shell">
     <header class="flux-header">
       <a class="flux-brand" href="<%=dispatcher.build_url()%>">
-        <img src="<%=media%>/logo.svg" alt="">
+        <span class="flux-brand-logo" aria-hidden="true"></span>
         <span><%=striptags(hostname)%></span>
       </a>
       <% if logged_in then -%>

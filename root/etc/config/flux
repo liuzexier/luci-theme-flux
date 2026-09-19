@@ -1,8 +1,5 @@
 config appearance 'theme'
 	option mode 'auto'
-	option primary_color '#0f766e'
-	option background_light '#f7f8fb'
-	option background_dark '#101418'
 	option tab_count '4'
 
 config menu 'slot1'

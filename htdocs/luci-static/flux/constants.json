@@ -1,0 +1,25 @@
+{
+  "appearance": {
+    "primary": "#8200db",
+    "legacyPrimary": ["#0f766e"],
+    "light": {
+      "background": "#f7f8fb",
+      "surface": "#ffffff",
+      "surfaceStrong": "#eef2f7",
+      "text": "#17202a",
+      "muted": "#64748b",
+      "border": "#d8dee8",
+      "danger": "#c2410c"
+    },
+    "dark": {
+      "background": "#101418",
+      "surface": "#171d23",
+      "surfaceStrong": "#202832",
+      "text": "#e6edf3",
+      "muted": "#9aa7b5",
+      "border": "#303a46",
+      "danger": "#fb923c"
+    },
+    "glassOpacity": 0.95
+  }
+}

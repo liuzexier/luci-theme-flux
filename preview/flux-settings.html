@@ -7,13 +7,12 @@
   <title>Flux 主题设置</title>
   <link rel="stylesheet" href="../htdocs/luci-static/flux/cascade.css">
   <script src="../htdocs/luci-static/flux/mobile.js" defer></script>
-  <script src="../htdocs/luci-static/flux/settings.js" defer></script>
 </head>
 <body class="logged-in">
   <div class="flux-shell">
     <header class="flux-header">
       <a class="flux-brand" href="index.html">
-        <img src="../htdocs/luci-static/flux/logo.svg" alt="">
+        <span class="flux-brand-logo" aria-hidden="true"></span>
         <span>OpenWrt Flux</span>
       </a>
       <button class="flux-menu-button" type="button" aria-label="打开全部菜单" aria-controls="flux-mobile-drawer" aria-expanded="false" data-flux-drawer-toggle>
@@ -73,9 +72,9 @@
               <section class="cbi-section" id="cbi-flux-theme">
                 <h2>外观</h2>
                 <div class="cbi-value"><label class="cbi-value-title">颜色模式</label><div class="cbi-value-field"><select name="cbid.flux.theme.mode"><option value="auto">跟随系统</option><option value="light">亮色</option><option value="dark">暗色</option></select></div></div>
-                <div class="cbi-value"><label class="cbi-value-title">主色调</label><div class="cbi-value-field"><input type="text" name="cbid.flux.theme.primary_color" value="#0f766e"></div></div>
-                <div class="cbi-value"><label class="cbi-value-title">亮色背景</label><div class="cbi-value-field"><input type="text" name="cbid.flux.theme.background_light" value="#f7f8fb"></div></div>
-                <div class="cbi-value"><label class="cbi-value-title">暗色背景</label><div class="cbi-value-field"><input type="text" name="cbid.flux.theme.background_dark" value="#101418"></div></div>
+                <div class="cbi-value"><label class="cbi-value-title">主色调</label><div class="cbi-value-field"><input type="text" name="cbid.flux.theme.primary_color"></div></div>
+                <div class="cbi-value"><label class="cbi-value-title">亮色背景</label><div class="cbi-value-field"><input type="text" name="cbid.flux.theme.background_light"></div></div>
+                <div class="cbi-value"><label class="cbi-value-title">暗色背景</label><div class="cbi-value-field"><input type="text" name="cbid.flux.theme.background_dark"></div></div>
                 <div class="cbi-value"><label class="cbi-value-title">快捷入口数量</label><div class="cbi-value-field"><select name="cbid.flux.theme.tab_count"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option></select></div></div>
               </section>
 
@@ -138,6 +137,37 @@
           '<div class="cbi-value"><label class="cbi-value-title">图标</label><div class="cbi-value-field"><select name="cbid.flux.' + slot + '.icon">' + options(icons, value[4]) + '</select></div></div>';
         host.parentNode.insertBefore(section, host);
       });
+    })();
+  </script>
+  <script>
+    (function () {
+      var constantsUrl = "../htdocs/luci-static/flux/constants.json";
+
+      fetch(constantsUrl, { cache: "no-store" })
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error("Unable to load Flux constants");
+          }
+
+          return response.json();
+        })
+        .then(function (constants) {
+          var appearance = constants.appearance || {};
+          var light = appearance.light || {};
+          var dark = appearance.dark || {};
+
+          document.querySelector('[name="cbid.flux.theme.primary_color"]').value = appearance.primary || "";
+          document.querySelector('[name="cbid.flux.theme.background_light"]').value = light.background || "";
+          document.querySelector('[name="cbid.flux.theme.background_dark"]').value = dark.background || "";
+        })
+        .catch(function (error) {
+          console.error("[Flux Preview]", error);
+        })
+        .finally(function () {
+          var script = document.createElement("script");
+          script.src = "../htdocs/luci-static/flux/settings.js";
+          document.body.appendChild(script);
+        });
     })();
   </script>
 </body>

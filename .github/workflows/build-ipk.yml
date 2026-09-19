@@ -29,6 +29,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.1.2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
       - name: Install build dependencies
         run: |
           sudo apt-get update
@@ -54,9 +65,13 @@ jobs:
             file \
             zstd
 
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
       - name: Build package
         env:
           OPENWRT_VERSION: ${{ inputs.openwrt_version || '24.10.7' }}
+          SKIP_FRONTEND_INSTALL: 1
           TARGETS: ${{ matrix.target }}
         run: scripts/build-ipk.sh
 

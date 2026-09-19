@@ -1,18 +1,41 @@
+/* LuCI and third-party compatibility layer. Keep selector order stable. */
+$flux-primary: null !default;
+$flux-primary-rgb: null !default;
+$flux-light-background: null !default;
+$flux-light-background-rgb: null !default;
+$flux-light-surface: null !default;
+$flux-light-surface-rgb: null !default;
+$flux-light-surface-strong: null !default;
+$flux-light-text: null !default;
+$flux-light-muted: null !default;
+$flux-light-border: null !default;
+$flux-light-danger: null !default;
+$flux-dark-background: null !default;
+$flux-dark-background-rgb: null !default;
+$flux-dark-surface: null !default;
+$flux-dark-surface-rgb: null !default;
+$flux-dark-surface-strong: null !default;
+$flux-dark-text: null !default;
+$flux-dark-muted: null !default;
+$flux-dark-border: null !default;
+$flux-dark-danger: null !default;
+$flux-glass-opacity: null !default;
+
 :root {
-  --flux-bg: #f7f8fb;
-  --flux-bg-rgb: 247, 248, 251;
-  --flux-surface: #ffffff;
-  --flux-surface-rgb: 255, 255, 255;
-  --flux-surface-strong: #eef2f7;
-  --flux-text: #17202a;
-  --flux-muted: #64748b;
-  --flux-border: #d8dee8;
-  --flux-accent: #0f766e;
-  --flux-accent-rgb: 15, 118, 110;
-  --flux-accent-strong: #0b5f59;
-  --flux-danger: #c2410c;
+  --flux-bg: #{$flux-light-background};
+  --flux-bg-rgb: #{$flux-light-background-rgb};
+  --flux-surface: #{$flux-light-surface};
+  --flux-surface-rgb: #{$flux-light-surface-rgb};
+  --flux-surface-strong: #{$flux-light-surface-strong};
+  --flux-text: #{$flux-light-text};
+  --flux-muted: #{$flux-light-muted};
+  --flux-border: #{$flux-light-border};
+  --flux-accent: #{$flux-primary};
+  --flux-accent-rgb: #{$flux-primary-rgb};
+  --flux-accent-strong: color-mix(in srgb, #{$flux-primary} 82%, black);
+  --flux-danger: #{$flux-light-danger};
   --flux-shadow: 0 16px 40px rgba(15, 23, 42, 0.14);
-  --flux-glass-opacity: 0.95;
+  --flux-glass-opacity: #{$flux-glass-opacity};
   --flux-glass-bg: rgba(var(--flux-surface-rgb), var(--flux-glass-opacity));
   --flux-glass-border: rgba(148, 163, 184, 0.26);
   --flux-icon-chevron-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
@@ -23,29 +46,31 @@
 
 @media (prefers-color-scheme: dark) {
   html:not([data-flux-theme="light"]) {
-    --flux-bg: #101418;
-    --flux-bg-rgb: 16, 20, 24;
-    --flux-surface: #171d23;
-    --flux-surface-rgb: 23, 29, 35;
-    --flux-surface-strong: #202832;
-    --flux-text: #e6edf3;
-    --flux-muted: #9aa7b5;
-    --flux-border: #303a46;
-    --flux-accent: #2dd4bf;
-    --flux-accent-strong: #5eead4;
-    --flux-danger: #fb923c;
+    --flux-bg: #{$flux-dark-background};
+    --flux-bg-rgb: #{$flux-dark-background-rgb};
+    --flux-surface: #{$flux-dark-surface};
+    --flux-surface-rgb: #{$flux-dark-surface-rgb};
+    --flux-surface-strong: #{$flux-dark-surface-strong};
+    --flux-text: #{$flux-dark-text};
+    --flux-muted: #{$flux-dark-muted};
+    --flux-border: #{$flux-dark-border};
+    --flux-accent: #{$flux-primary};
+    --flux-accent-rgb: #{$flux-primary-rgb};
+    --flux-accent-strong: color-mix(in srgb, #{$flux-primary} 76%, white);
+    --flux-danger: #{$flux-dark-danger};
     --flux-shadow: 0 18px 44px rgba(0, 0, 0, 0.34);
   }
 }
 
 html[data-flux-theme="dark"] {
-  --flux-surface: #171d23;
-  --flux-surface-rgb: 23, 29, 35;
-  --flux-surface-strong: #202832;
-  --flux-text: #e6edf3;
-  --flux-muted: #9aa7b5;
-  --flux-border: #303a46;
-  --flux-danger: #fb923c;
+  --flux-surface: #{$flux-dark-surface};
+  --flux-surface-rgb: #{$flux-dark-surface-rgb};
+  --flux-surface-strong: #{$flux-dark-surface-strong};
+  --flux-text: #{$flux-dark-text};
+  --flux-muted: #{$flux-dark-muted};
+  --flux-border: #{$flux-dark-border};
+  --flux-accent-strong: color-mix(in srgb, var(--flux-accent) 76%, white);
+  --flux-danger: #{$flux-dark-danger};
   --flux-shadow: 0 18px 44px rgba(0, 0, 0, 0.34);
 }
 
@@ -183,10 +208,27 @@ a:focus-visible {
   min-width: 0;
 }
 
-.flux-brand img {
+.flux-brand img,
+.flux-brand-logo {
   display: block;
   height: 28px;
   width: 28px;
+}
+
+.flux-brand-logo {
+  background: var(--flux-accent);
+  border-radius: 22%;
+  flex: 0 0 auto;
+  overflow: hidden;
+  position: relative;
+}
+
+.flux-brand-logo::before {
+  background: #fff;
+  clip-path: polygon(28% 28%, 75% 28%, 55% 48%, 75% 48%, 37.5% 78%, 50% 53%, 28% 53%);
+  content: "";
+  inset: 0;
+  position: absolute;
 }
 
 .flux-brand span {
@@ -1067,12 +1109,13 @@ body.modal-overlay-active #modal_overlay {
 .cbi-section {
   margin-bottom: 16px;
   max-width: 100%;
-  overflow: auto;
+  overflow: visible;
   padding: 16px;
 }
 
 .cbi-section-node {
   margin: 0;
+  overflow: visible;
 }
 
 fieldset {
@@ -1517,7 +1560,17 @@ th,
 
 .cbi-value-field.cbi-dropdown-open {
   position: relative;
-  z-index: 130;
+  z-index: 220;
+}
+
+/* Keep an open dropdown above following fields and neighboring cards. */
+.cbi-map:has(.cbi-dropdown[open]),
+.cbi-section:has(.cbi-dropdown[open]),
+.cbi-section-node:has(.cbi-dropdown[open]),
+.cbi-value:has(.cbi-dropdown[open]) {
+  overflow: visible;
+  position: relative;
+  z-index: 210;
 }
 
 /* Safari turns overflow-x clipping into a vertical clipping context too. */
@@ -2068,6 +2121,102 @@ th,
     display: block;
     margin-bottom: 6px;
     padding-top: 0;
+  }
+
+  /* LuCI renders the port overview as 100px cards in an auto-fit grid. */
+  #view .cbi-section div:not(.network-status-table):has(> .ifacebox) {
+    align-items: stretch !important;
+    gap: 10px;
+    grid-template-columns: minmax(0, 1fr) !important;
+    justify-items: stretch !important;
+    text-align: left !important;
+  }
+
+  #view .cbi-section div:not(.network-status-table):has(> .ifacebox) > .ifacebox {
+    box-sizing: border-box;
+    display: grid;
+    gap: 8px 12px;
+    grid-template-columns: 88px minmax(0, 1fr);
+    margin: 0 !important;
+    min-width: 0;
+    padding: 12px;
+    text-align: left;
+    width: 100% !important;
+  }
+
+  #view .cbi-section div:not(.network-status-table):has(> .ifacebox)
+    > .ifacebox
+    > .ifacebox-head:first-child,
+  #view .cbi-section div:not(.network-status-table):has(> .ifacebox)
+    > .ifacebox
+    > .ifacebox-body:nth-child(2) {
+    text-align: center;
+  }
+
+  #view .cbi-section div:not(.network-status-table):has(> .ifacebox)
+    > .ifacebox
+    > .ifacebox-head.cbi-tooltip-container {
+    align-self: stretch;
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    min-width: 0;
+  }
+
+  #view .cbi-section div:not(.network-status-table):has(> .ifacebox)
+    > .ifacebox
+    > .ifacebox-body:last-child {
+    border-top: 1px solid var(--flux-border);
+    grid-column: 1 / -1;
+    padding-top: 10px;
+  }
+
+  #view .cbi-section div:not(.network-status-table):has(> .ifacebox)
+    > .ifacebox
+    > .ifacebox-body:last-child
+    > .cbi-tooltip-container {
+    font-size: 13px !important;
+  }
+
+  #view .cbi-section div:not(.network-status-table):has(> .ifacebox)
+    > .ifacebox
+    > .ifacebox-body:last-child
+    .cbi-tooltip {
+    display: block !important;
+    margin-top: 8px;
+    opacity: 1 !important;
+    position: static !important;
+    visibility: visible !important;
+    width: auto !important;
+  }
+
+  #view .cbi-section div:not(.network-status-table):has(> .ifacebox)
+    > .ifacebox
+    > .ifacebox-body:last-child
+    .cbi-tooltip
+    > span {
+    display: grid;
+    gap: 6px 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #view .cbi-section div:not(.network-status-table):has(> .ifacebox)
+    > .ifacebox
+    > .ifacebox-body:last-child
+    .cbi-tooltip
+    > span
+    > br {
+    display: none;
+  }
+
+  #view .cbi-section div:not(.network-status-table):has(> .ifacebox)
+    > .ifacebox
+    > .ifacebox-body:last-child
+    .nowrap {
+    display: flex;
+    gap: 6px;
+    justify-content: space-between;
+    min-width: 0;
+    white-space: normal;
   }
 
   input,

@@ -1,5 +1,9 @@
 #!/bin/sh
 
+constants_file="/www/luci-static/flux/constants.json"
+theme_primary_default="$(jsonfilter -i "$constants_file" -e '@.appearance.primary')"
+theme_background_light_default="$(jsonfilter -i "$constants_file" -e '@.appearance.light.background')"
+theme_background_dark_default="$(jsonfilter -i "$constants_file" -e '@.appearance.dark.background')"
 theme_mode="$(uci -q get flux.theme.mode)"
 theme_primary_color="$(uci -q get flux.theme.primary_color)"
 theme_background_light="$(uci -q get flux.theme.background_light)"
@@ -37,9 +41,9 @@ slot5_icon="$(uci -q get flux.slot5.icon)"
 slot5_legacy_path="$(uci -q get flux.slot5.path)"
 
 [ -n "$theme_mode" ] || theme_mode="auto"
-[ -n "$theme_primary_color" ] || theme_primary_color="#0f766e"
-[ -n "$theme_background_light" ] || theme_background_light="#f7f8fb"
-[ -n "$theme_background_dark" ] || theme_background_dark="#101418"
+[ -n "$theme_primary_color" ] || theme_primary_color="$theme_primary_default"
+[ -n "$theme_background_light" ] || theme_background_light="$theme_background_light_default"
+[ -n "$theme_background_dark" ] || theme_background_dark="$theme_background_dark_default"
 case "$theme_tab_count" in
 	1|2|3|4|5) ;;
 	*) theme_tab_count="4" ;;

@@ -18,6 +18,17 @@ fi
 command -v curl >/dev/null || { echo "curl is required" >&2; exit 1; }
 command -v tar >/dev/null || { echo "tar is required" >&2; exit 1; }
 command -v rsync >/dev/null || { echo "rsync is required" >&2; exit 1; }
+command -v pnpm >/dev/null || { echo "pnpm is required to build cascade.css" >&2; exit 1; }
+
+echo "==> Installing frontend dependencies"
+if [ "${SKIP_FRONTEND_INSTALL:-0}" != "1" ]; then
+  (cd "$ROOT_DIR" && pnpm install --frozen-lockfile)
+else
+  echo "==> Reusing frontend dependencies installed by the caller"
+fi
+
+echo "==> Building Flux CSS"
+(cd "$ROOT_DIR" && pnpm build:css && pnpm check:css)
 
 mkdir -p "$DOWNLOAD_DIR" "$SDK_DIR" "$OUT_DIR"
 
@@ -43,7 +54,9 @@ copy_theme_into_sdk() {
     --exclude ".github" \
     --exclude "build" \
     --exclude "dist" \
+    --exclude "node_modules" \
     --exclude "preview" \
+    --exclude "src" \
     "$ROOT_DIR/" "$dest/"
 
   mkdir -p "$sdk/package/feeds/luci"

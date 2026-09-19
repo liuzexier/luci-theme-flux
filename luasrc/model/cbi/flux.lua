@@ -1,7 +1,13 @@
 local fs = require "nixio.fs"
 local dispatcher = require "luci.dispatcher"
+local jsonc = require "luci.jsonc"
 
 local m = Map("flux", translate("Flux 主题设置"), translate("配置 Flux 主题的外观和底部快捷入口。"))
+local constants_path = (dispatcher.context.docroot or "/www") .. "/luci-static/flux/constants.json"
+local constants = jsonc.parse(fs.readfile(constants_path) or "") or {}
+local appearance_defaults = constants.appearance or {}
+local light_defaults = appearance_defaults.light or {}
+local dark_defaults = appearance_defaults.dark or {}
 local menu_root = dispatcher.menu_json() or {}
 local admin_tree = menu_root.children and menu_root.children.admin or menu_root
 local menu_choices = {}
@@ -21,6 +27,18 @@ local icon_choices = {
   { "all", translate("全部") }
 }
 local valid_icons = {}
+
+local function is_legacy_primary(value)
+  value = tostring(value or ""):lower()
+
+  for _, legacy in ipairs(appearance_defaults.legacyPrimary or {}) do
+    if value == tostring(legacy):lower() then
+      return true
+    end
+  end
+
+  return false
+end
 
 for _, icon in ipairs(icon_choices) do
   valid_icons[icon[1]] = true
@@ -164,20 +182,24 @@ mode.default = "auto"
 mode.rmempty = false
 
 local primary = appearance:option(Value, "primary_color", translate("主色调"))
-primary.default = "#0f766e"
-primary.placeholder = "#0f766e"
+primary.default = appearance_defaults.primary
+primary.placeholder = primary.default
 primary.datatype = "string"
 primary.rmempty = false
+function primary.cfgvalue(self, section)
+  local value = Value.cfgvalue(self, section)
+  return is_legacy_primary(value) and self.default or value
+end
 
 local bg_light = appearance:option(Value, "background_light", translate("亮色背景"))
-bg_light.default = "#f7f8fb"
-bg_light.placeholder = "#f7f8fb"
+bg_light.default = light_defaults.background
+bg_light.placeholder = bg_light.default
 bg_light.datatype = "string"
 bg_light.rmempty = false
 
 local bg_dark = appearance:option(Value, "background_dark", translate("暗色背景"))
-bg_dark.default = "#101418"
-bg_dark.placeholder = "#101418"
+bg_dark.default = dark_defaults.background
+bg_dark.placeholder = bg_dark.default
 bg_dark.datatype = "string"
 bg_dark.rmempty = false
 

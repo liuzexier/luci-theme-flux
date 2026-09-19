@@ -1,0 +1,46 @@
+$flux-primary: null !default;
+$flux-primary-rgb: null !default;
+$flux-light-background: null !default;
+$flux-light-background-rgb: null !default;
+$flux-light-surface: null !default;
+$flux-light-surface-rgb: null !default;
+$flux-light-surface-strong: null !default;
+$flux-light-text: null !default;
+$flux-light-muted: null !default;
+$flux-light-border: null !default;
+$flux-light-danger: null !default;
+$flux-dark-background: null !default;
+$flux-dark-background-rgb: null !default;
+$flux-dark-surface: null !default;
+$flux-dark-surface-rgb: null !default;
+$flux-dark-surface-strong: null !default;
+$flux-dark-text: null !default;
+$flux-dark-muted: null !default;
+$flux-dark-border: null !default;
+$flux-dark-danger: null !default;
+$flux-glass-opacity: null !default;
+
+@use "tailwind";
+@use "compatibility" with (
+  $flux-primary: $flux-primary,
+  $flux-primary-rgb: $flux-primary-rgb,
+  $flux-light-background: $flux-light-background,
+  $flux-light-background-rgb: $flux-light-background-rgb,
+  $flux-light-surface: $flux-light-surface,
+  $flux-light-surface-rgb: $flux-light-surface-rgb,
+  $flux-light-surface-strong: $flux-light-surface-strong,
+  $flux-light-text: $flux-light-text,
+  $flux-light-muted: $flux-light-muted,
+  $flux-light-border: $flux-light-border,
+  $flux-light-danger: $flux-light-danger,
+  $flux-dark-background: $flux-dark-background,
+  $flux-dark-background-rgb: $flux-dark-background-rgb,
+  $flux-dark-surface: $flux-dark-surface,
+  $flux-dark-surface-rgb: $flux-dark-surface-rgb,
+  $flux-dark-surface-strong: $flux-dark-surface-strong,
+  $flux-dark-text: $flux-dark-text,
+  $flux-dark-muted: $flux-dark-muted,
+  $flux-dark-border: $flux-dark-border,
+  $flux-dark-danger: $flux-dark-danger,
+  $flux-glass-opacity: $flux-glass-opacity
+);
