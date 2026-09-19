@@ -57,5 +57,5 @@
 - 本地 CSS 检查：`pnpm check:css`。
 - Linux 上构建 IPK：`scripts/build-ipk.sh`。
 - macOS 上通过 `.github/workflows/build-ipk.yml` 构建和发布 IPK。
-- 版本号由 `Makefile` 的 `PKG_VERSION` 和 `PKG_RELEASE` 组成，tag 格式为 `v<PKG_VERSION>-r<PKG_RELEASE>`。
+- 版本号由 `Makefile` 的 `PKG_VERSION` 和 `PKG_RELEASE` 组成，tag 格式为 `v<PKG_VERSION>-r<PKG_RELEASE>`。如果发布流程失败后修复了仓库配置，应递增 `PKG_RELEASE`，不要复用已推送的 tag。
 - 推送 `main` 后，GitHub Action 会构建 `x86/64` 与 `mediatek/filogic`，并发布对应 Release。发布前必须确认工作区只包含本次变更。
