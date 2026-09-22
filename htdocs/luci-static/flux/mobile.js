@@ -1,8 +1,6 @@
 (function () {
   "use strict";
 
-  console.info("%c[Flux Local Dev]%c Assets are served by the local Vite proxy.", "font-weight:700", "font-weight:400");
-
   function hexRgb(value) {
     var hex = String(value || "").replace("#", "");
     return [0, 2, 4].map(function (offset) {

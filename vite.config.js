@@ -134,6 +134,14 @@ function localFluxAssets() {
             return;
           }
 
+          // Only the development proxy adds this message; packaged assets stay quiet.
+          if (relativePath === 'mobile.js') {
+            content = Buffer.concat([
+              Buffer.from('console.info("%c[Flux Local Dev]%c Assets are served by the local Vite proxy.", "font-weight:700", "font-weight:400");\n'),
+              content,
+            ]);
+          }
+
           const extension = path.extname(assetPath);
           const contentTypes = {
             '.css': 'text/css; charset=utf-8',
